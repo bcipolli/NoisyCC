@@ -36,5 +36,14 @@ function [an] = r_analyze(net, pats, d)
         %d.lesion.avgerr - d.nolesion.avgerr         % Hemispheric diff in activation
         
         % Sub-analysis
-        net.fn.analyze(net, pats, d);
-    end; 
+        if isfield(net.fn, 'analyze')
+            try
+                net.fn.analyze(net, pats, d);
+            catch exception
+                if ~strcmp(exception.identifier, 'MATLAB:UndefinedFunction')
+                    throw(exception);
+                end;
+            end;
+        end; 
+    end;
+    
