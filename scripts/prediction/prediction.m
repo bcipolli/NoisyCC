@@ -52,12 +52,12 @@ net.sets.activity_dependent = true;  % if there is noise, make it activity-depen
 net.sets.noise_init       = 0;
 net.sets.noise_input      = 1E-6;  % Noisy input
 
-net.sets.dirname          = fullfile(r_out_path('cache'), guru_fileparts(which(mfilename), 'dir'))  % output directory
+net.sets.dirname          = fullfile(guru_getOutPath('cache'), guru_fileparts(which(mfilename), 'dir'))  % output directory
 
 net.sets.niters = 2000;
 net.sets.axon_noise = 0;
 net.sets.dirname    = fullfile(net.sets.dirname, mfilename);
 
-r_looper(net, 25); % run 25 network instances
+r_train_many(net, 25); % run 25 network instances
 
 

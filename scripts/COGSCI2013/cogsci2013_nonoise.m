@@ -55,10 +55,10 @@ net.sets.noise_init       = 0;%.001;%1;
 net.sets.noise_input      = 1E-6;%.001;%001;%1;
 
 %
-%[net,pats,data]          = r_main(net);
+%[net,pats,data]          = r_train_one(net);
 %[data.an]                = r_analyze(net, pats, data);
 
-dirname = r_out_path('runs', mfilename);
+dirname = guru_getOutPath('runs', mfilename);
 sets = net.sets;
 
 if ~exist(dirname,'dir'), mkdir(dirname); end;
@@ -67,7 +67,7 @@ for s=(288+[1:25])
    net.sets = sets;
    net.sets.rseed = s;
    try
-     [net,pats,data]          = r_main(net);
+     [net,pats,data]          = r_train_one(net);
      [data.an]                = r_analyze(net, pats, data);
      unix(['mv ' net.sets.matfile ' ./' dirname]);
    catch

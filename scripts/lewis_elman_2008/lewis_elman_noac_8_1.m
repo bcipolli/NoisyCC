@@ -60,14 +60,14 @@ if (~net.sets.continue)
     net.sets.noise_input      = 0;%001;
     %net.sets.axon_noise       = 1E-3;
 
-    %net.sets.dirname          = fullfile(r_out_path('cache'), guru_fileparts(which(mfilename), 'dir'));  % output directory
+    %net.sets.dirname          = fullfile(guru_getOutPath('cache'), guru_fileparts(which(mfilename), 'dir'));  % output directory
     
     if ~isfield(net.sets,'run'), net.sets.run = true; end;
 end;
 
 %
 if net.sets.run
-    r_looper(net, 10); % run 25 network instances
-    %[net,pats,data]          = r_main(net);
+    r_train_many(net, 10); % run 25 network instances
+    %[net,pats,data]          = r_train_one(net);
     %[data.an]                = r_analyze(net, pats, data);
 end;
