@@ -1,5 +1,5 @@
 function [nets, pats, datas] = r_train_and_analyze_many(net, n_nets)
-%function r_train_many(net, n_nets)
+%function r_train_and_analyze_many(net, n_nets)
 %
 % Loops over some # of networks to execute them.
 
