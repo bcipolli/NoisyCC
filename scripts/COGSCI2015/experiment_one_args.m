@@ -6,6 +6,9 @@ function net = dissertation_args(tsteps, Idel, Idur, Sdel, Sdur)
 % Idur: duration (# time steps, after onset @ Idel) to keep input on
 % Sdel: delay (reverse, from end) to measure error
 % Sdur: duration (# time steps, reverse from Sdel) to measure the error.
+    close all;  % Hack place to put it, but tired of saving all sorts of crazy figures!
+    addpath(genpath(fullfile(fileparts(which(mfilename)), '..', '..', 'code')));
+    dbstop if error;
 
     if ~exist('tsteps', 'var') || isempty(tsteps), tsteps = 30; end;
     if ~exist('Idel', 'var')   || isempty(Idel),   Idel   = 1; end;
@@ -57,4 +60,5 @@ function net = dissertation_args(tsteps, Idel, Idur, Sdel, Sdur)
     net.sets.noise_init       = 0;
     net.sets.noise_input      = 0; %%1E-6;  % Noisy input
 
-    net.sets.dirname          = fullfile(guru_getOutPath('cache'), guru_fileparts(which(mfilename), 'dir'))  % output directory
+    net.sets.test_freq        = 100;
+    net.sets.dirname          = fullfile(guru_getOutPath('cache'), net.sets.dataset);
