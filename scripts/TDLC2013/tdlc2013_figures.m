@@ -32,9 +32,9 @@ function fs=tdlc2013_figures(data_path, plots, intype, etype, cache_file)
     end;
         %if ~exist('cache_file', 'var'),cache_file= fullfile(guru_getOutPath('cache'), 'tdlc2013_cache.mat'); end;
 
-    [data, nts, noise, delay] = collect_data_looped_tdlc(data_dir, cache_file);
+    [data, nts, noise, delay] = r_collect_data_looped_tdlc(data_dir, cache_file);
     if    isempty(data),               error('No data found at %s', data_dir);
-    elseif ~exist(cache_file, 'file'), save_cache_data(cache_file); end;
+    elseif ~exist(cache_file, 'file'), r_save_cache_data(cache_file); end;
     data = data(nts<75);
     noise = noise(nts<75);
     delay = delay(nts<75);

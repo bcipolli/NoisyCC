@@ -43,7 +43,7 @@ text(0.03, 0.75, sprintf('Raw\nError'),       'HorizontalAlignment', 'Center', '
 
 % Save cache file
 if ~exist(cache_file, 'file')
-    save_cache_data(cache_file);
+    r_save_cache_data(cache_file);
 end;
 
 %% Experiment 2

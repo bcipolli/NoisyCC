@@ -5,5 +5,5 @@ function [cdata, ndata, ts] = r_collect_two_datasets(clean_dir, noise_dir, cache
 %if ~exist('noise_dir', 'var'), noise_dir = 'noise.10.1'; end;
 if ~exist('cache_file', 'var'),cache_file= fullfile(guru_getOutPath('cache'),'cs2013_cache.mat'); end;
 
-[cdata,ts] = get_cache_data(clean_dir, cache_file);
-[ndata]    = get_cache_data(noise_dir, cache_file);
+[cdata,ts] = r_get_cache_data(clean_dir, cache_file);
+[ndata]    = r_get_cache_data(noise_dir, cache_file);

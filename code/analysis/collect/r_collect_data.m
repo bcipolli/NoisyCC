@@ -1,4 +1,4 @@
-function [an,sets] = collect_data(dirname, resave)
+function [an,sets] = r_collect_data(dirname, resave)
 %
 
   if ~exist('resave','var'), resave = false; end;

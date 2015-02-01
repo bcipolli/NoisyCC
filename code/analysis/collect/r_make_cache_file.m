@@ -1,4 +1,4 @@
-function [data_cache,dir_cache,sets_cache] = make_cache_file(dirnames, cache_file)
+function [data_cache,dir_cache,sets_cache] = r_make_cache_file(dirnames, cache_file)
 %function make_cache(dirname(s), cache_file)
 %
 % Take a set of dirnames, and save a cache file of their summary data to disk.
@@ -17,7 +17,7 @@ function [data_cache,dir_cache,sets_cache] = make_cache_file(dirnames, cache_fil
     if ~isempty(g_dir_cache)
       dirnames = {dirnames};
     else
-      [~,~,dirnames] = collect_data_looped( dirnames, '', '' );
+      [~,~,dirnames] = r_collect_data_looped( dirnames, '', '' );
     end;
   elseif ~iscell(dirnames)
     error('dirnames input var must be a string or a cell array of strings');

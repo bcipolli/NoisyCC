@@ -51,5 +51,5 @@ end;
 
 % Save off the cache file, for future fast access
 if ~exist(cache_file, 'file')
-    save_cache_data(cache_file);
+    r_save_cache_data(cache_file);
 end;

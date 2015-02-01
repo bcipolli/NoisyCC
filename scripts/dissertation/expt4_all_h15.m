@@ -24,6 +24,6 @@ end;
 % Make into one giant cache
 cache_dir     = guru_fileparts(net.sets.dirname, 'dir');
 cache_file    = fullfile(cache_dir, [mfilename '_cache.mat']);
-[~,~,folders] = collect_data_looped( cache_dir, '', '' );
+[~,~,folders] = r_collect_data_looped( cache_dir, '', '' );
 
-make_cache_file(folders, cache_file);
+r_make_cache_file(folders, cache_file);
