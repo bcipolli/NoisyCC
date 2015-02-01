@@ -85,7 +85,7 @@ for rseed=(289-1+[1:chunk_size:25])
           net.sets.rseed = rseed;
           net.sets.dirname = dirname;
 
-          r_train_and_analyze_many(net, chunk_size);
+          r_train_and_analyze_all(net, chunk_size);
       end;
     end;
   end;
