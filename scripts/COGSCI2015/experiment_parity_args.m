@@ -7,6 +7,10 @@ function net = dissertation_args(tsteps, Idel, Idur, Sdel, Sdur)
 % Sdel: delay (reverse, from end) to measure error
 % Sdur: duration (# time steps, reverse from Sdel) to measure the error.
 
+    close all;  % Hack place to put it, but tired of saving all sorts of crazy figures!
+    addpath(genpath(fullfile(fileparts(which(mfilename)), '..', '..', 'code')));
+    dbstop if error;
+
     if ~exist('tsteps', 'var') || isempty(tsteps), tsteps = 30; end;
     if ~exist('Idel', 'var')   || isempty(Idel),   Idel   = 1; end;
     if ~exist('Idur', 'var')   || isempty(Idur),   Idur   = 6; end;
@@ -16,13 +20,14 @@ function net = dissertation_args(tsteps, Idel, Idur, Sdel, Sdur)
     net.sets.rseed = 289;
 
     %training parameters
-    net.sets.niters          = 1000; %training iterations
+    net.sets.niters          = 250; %training iterations
     net.sets.online          = false;
-    net.sets.ncc             = 3;
+    net.sets.nhidden_per     = 10;%
+    net.sets.ncc             = 2;
     net.sets.cc_wt_lim       = inf*[-1 1];  %% 2?
     net.sets.W_LIM           = inf*[-1 1];  %% 2?
-    net.sets.train_criterion = 0.5;
-    %net.sets.dataset         = 'lewis_elman'; % Don't set the dataset.
+    net.sets.train_criterion = 0.25;
+    net.sets.dataset         = 'parity';
     net.sets.init_type       = 'lewis_elman';
     net.sets.train_mode      = 'resilient';
 
@@ -47,14 +52,12 @@ function net = dissertation_args(tsteps, Idel, Idur, Sdel, Sdur)
     net.sets.lambda_w        = 2E-2;    % lambda*E to control kappa.
     net.sets.phi_w           = 0.25;    % multiplicative decrease to eta
     net.sets.alpha_w         = 0.25;    %% momentum
-
     net.sets.grad_pow        = 3;
-
-    net.sets.nhidden_per      = 15;%
 
     net.sets.axon_noise       = 0.02;  % 2% average noise
     net.sets.activity_dependent = true;  % if there is noise, make it activity-dependent
     net.sets.noise_init       = 0;
     net.sets.noise_input      = 0; %%1E-6;  % Noisy input
 
-    net.sets.dirname          = fullfile(guru_getOutPath('cache'), guru_fileparts(which(mfilename), 'dir'))  % output directory
+    net.sets.test_freq        = 25;
+    net.sets.dirname          = fullfile(guru_getOutPath('cache'), net.sets.dataset);
