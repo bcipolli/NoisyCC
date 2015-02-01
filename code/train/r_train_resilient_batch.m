@@ -11,8 +11,6 @@ function [net,data] = r_train_resilient_batch(net,pats,data)
     E               = zeros(ns.niters,pats.npat,pats.tsteps,net.noutput, 'single');
     data.E_pat      = zeros(ns.niters,pats.npat,net.noutput, 'single');           % error
     data.hu_pat     = zeros(ns.niters,pats.npat,net.nhidden, 'single');           % error
-    data.E_lesion   = zeros(floor(ns.niters/ns.test_freq),pats.npat,net.noutput, 'single');           % error
-    data.hu_lesion  = zeros(floor(ns.niters/ns.test_freq),pats.npat,net.nhidden, 'single');           % error
     data.E_iter     = zeros(ns.niters,1, 'single');
     data.learncurve = zeros(ns.niters,pats.npat,net.noutput,'single');
     data.actcurve   = zeros(pats.tsteps,pats.npat,net.noutput,'single');
@@ -74,6 +72,7 @@ function [net,data] = r_train_resilient_batch(net,pats,data)
     % Main Loop
     %%%%%%%%%%%%%%
     last_measure_ts = find(sum(sum(pats.s,3),2),1,'last'); % keep an index of the last measurement point
+    test_fn = guru_iff(isfield(ns, 'test_fn'), str2func(ns.test_fn), @(i,n,p,d) d);
 
     if (ns.verbose), r_print_pats(data); end;
 
@@ -261,12 +260,7 @@ function [net,data] = r_train_resilient_batch(net,pats,data)
 
         %
         if (mod(iter,ns.test_freq)==0)
-            nl = r_lesion_cc(net);
-            td = r_forwardpass(nl,pats,data);
-            lesion_iter = round(iter/ns.test_freq);
-            data.E_lesion(lesion_iter,:,:) = td.E(last_measure_ts,:,:);
-            data.hu_lesion(lesion_iter,:,:) = td.y(last_measure_ts,:,net.idx.hidden);
-            clear('nl','td');
+            data = test_fn(iter, net, pats, data);
         end;
 
         % Do some reporting
@@ -519,10 +513,10 @@ function [net,data] = r_train_resilient_batch(net,pats,data)
     % Cut unused pre-allocated space
     data.good_update = data.good_update(1:iter);
     data.E_pat       = data.E_pat(1:iter,:,:);
-    data.E_lesion    = data.E_lesion(1:floor(iter/100),:,:);
     data.E_iter      = data.E_iter(1:iter);
     data.learncurve  = data.learncurve(1:iter,:,:);
     data.y           = y;
+    data = test_fn(-iter, net, pats, data);  % Call back for cleanup
 
     net.sets = ns; % save off any changes
 
