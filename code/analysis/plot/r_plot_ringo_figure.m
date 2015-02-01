@@ -1,4 +1,4 @@
-function fs=r_plot_ringo_figure(data_path, plots, intype, etype, cache_file)
+function fs=r_plot_ringo_figure(data, noiese, delay, nts, plots, intype, etype)
 % data_path: directory of all raw data.  OR, a pointer to the cache file.
 % intype: all, inter, intra
 % etype : clserr, err (sse)
@@ -12,29 +12,8 @@ function fs=r_plot_ringo_figure(data_path, plots, intype, etype, cache_file)
     if ~exist('plots','var'),  plots     = [ 0 1 ]; end;
     if ~exist('intype','var'), intype = 'all'; end;
     if ~exist('etype', 'var'), etype  = 'clserr'; end;
-    if ~exist('cache_file','var'), cache_file = ''; end;
 
-    % Determine the data directory, based on the setting of the data_path and cache_file
-
-    % cache file with no dir data; set dir_data to empty
-    %   so that looper will know to load data from cache file
-    if strcmp('.mat', guru_fileparts(data_path,'ext')) && isempty(cache_file)
-        cache_file = data_path;
-        if ~exist(cache_file,'file'), error('Could not find cache file: %s', cache_file); end;
-        data_dir = [];
-        
-    % Fix path  
-    elseif ~exist(data_path,'dir') && exist(fullfile(guru_getOutPath('cache'), data_path), 'dir')
-        data_dir = fullfile(guru_getOutPath('cache'), data_path);
-
-    else
-        data_dir = data_path
-    end;
-        %if ~exist('cache_file', 'var'),cache_file= fullfile(guru_getOutPath('cache'), 'tdlc2013_cache.mat'); end;
-
-    [data, nts, noise, delay] = r_collect_data_looped_tdlc(data_dir, cache_file);
-    if    isempty(data),               error('No data found at %s', data_dir);
-    elseif ~exist(cache_file, 'file'), r_save_cache_data(cache_file); end;
+    % Remove the final timestep, it's ugly.
     data = data(nts<75);
     noise = noise(nts<75);
     delay = delay(nts<75);
