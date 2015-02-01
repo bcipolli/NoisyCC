@@ -73,6 +73,31 @@ function [nets, pats, datas, figs] = r_train_and_analyze_all(template_net, nexam
         true);      % close figures after save
 
 
+function [nets, pats, datas] = r_train_and_analyze_many(net, n_nets)
+%function r_train_and_analyze_many(net, n_nets)
+%
+% Loops over some # of networks to execute them.
+
+
+    % Select # of networks to run
+    if ~exist('n_nets','var')
+      if isfield(net.sets,'n_nets'), n_nets = net.sets.n_nets;
+      else                           n_nets = 10;
+      end;
+    end;
+
+    % Get random seed, save default network settings
+    min_rseed = net.sets.rseed;
+    sets = net.sets;
+
+    nets = cell(n_nets, 1);
+    datas = cell(n_nets, 1);
+    for si=(min_rseed-1+[1:n_nets])
+        ii = si - min_rseed + 1;
+        [nets{ii}, pats, datas{ii}] = r_train_and_analyze_one(sets, si);
+    end;
+
+
 function net = set_net_params(template_net, ncc, delay, T, mi)
     % Helper function to set net parameters; this complains if
     %   done in a parfor loop
@@ -81,8 +106,8 @@ function net = set_net_params(template_net, ncc, delay, T, mi)
     net = template_net;
     net.sets.ncc = ncc;
     net.sets.D_CC_INIT(:) = delay;
-    net.sets.T_INIT(:) = T * net.sets.dt;
-    net.sets.T_LIM(:) = T * net.sets.dt;
+    net.sets.T_INIT(:) = T;
+    net.sets.T_LIM(:) = T;
     net.sets = guru_rmfield(net.sets, {'D_LIM', 'matfile'});
     %net.sets.debug = false;
 

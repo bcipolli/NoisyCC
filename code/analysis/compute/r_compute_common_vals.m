@@ -34,7 +34,7 @@ function vals = compute_common_vals(nets, sims, unique_values)
     vals.max_iters = net.sets.niters;
 
     % Documentation & filtering; the ordering is a centralized assumption
-    %   that is implemented in r_train_and_analyze_many
+    %   that is implemented in r_train_and_analyze_all
     %
     % NOTE that these will be filtered below.
     vals.dims.ids = {'ncc', 'delays', 'Ts'};
