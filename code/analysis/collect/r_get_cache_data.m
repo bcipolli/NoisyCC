@@ -1,5 +1,5 @@
-function [data,ts,sets] = get_cache_data(dirs, cache_file, force_load)
-%function [data,ts] = get_cache_data(irs, cache_file, force_load)
+function [data,ts,sets] = r_get_cache_data(dirs, cache_file, force_load)
+%function [data,ts] = r_get_cache_data(irs, cache_file, force_load)
 %
 % Returns summarized data from the given directory.  It can come from 3
 %   places, searched in this order:
@@ -60,7 +60,7 @@ function [data,ts,sets] = get_cache_data(dirs, cache_file, force_load)
                 if ~exist(cache_file,'file'), error('Couldn''t find cache file: %s', cache_file); end;
 
                 % Cache exists; either load it and merge.
-                load_cache_file(cache_file);
+                r_load_cache_file(cache_file);
 
                 [~,idx] = intersect(dirnames(remain_dirs), g_dir_cache);
                 cur_found_dirs = remain_dirs(idx);
@@ -75,7 +75,7 @@ function [data,ts,sets] = get_cache_data(dirs, cache_file, force_load)
                   end;
 
                   % Load the data
-                  [g_data_cache{end+1},g_sets_cache{end+1}] = collect_data(d);
+                  [g_data_cache{end+1},g_sets_cache{end+1}] = r_collect_data(d);
                   [g_dir_cache(end+1)]                      = dirnames({d});
                 end;
 

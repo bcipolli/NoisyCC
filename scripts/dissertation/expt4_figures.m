@@ -15,11 +15,11 @@ function [fh] = expt4_figures(force)
     %
     if ~exist(cache_file, 'file') || force,
         cache_dir = fullfile(fileparts(cache_file), 'expt4_all_h15');
-        [~, ~, folders] = collect_data_looped(cache_dir, cache_file);
+        [~, ~, folders] = r_collect_data_looped(cache_dir, cache_file);
         guru_assert(length(folders) == 8, sprintf('8 folders should be found; %d were found within %s', length(folders), cache_dir));
-        make_cache_file(folders, cache_file);
+        r_make_cache_file(folders, cache_file);
     end;
-    load_cache_file(cache_file);
+    r_load_cache_file(cache_file);
 
 
     %% Preliminary tests

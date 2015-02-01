@@ -1,4 +1,4 @@
-function save_cache_data(cache_file, dir_cache, data_cache)
+function r_save_cache_data(cache_file, dir_cache, data_cache)
 
     global g_dir_cache g_data_cache;
 
