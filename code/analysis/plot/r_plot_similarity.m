@@ -11,7 +11,6 @@ function fig_handles = r_plot_similarity(nets, sim, simstats, lagstats, figs)
     npattypes = length(pat_types);
     nlocs = length(sim.hemi_locs);
     tsteps = sim.tsteps;
-    nsims = length(sim.rh_output(1).patsim);
 
     % Now that output has been suppressed, print info about the network.
     title_addendum = sprintf('D=%d ncc=%d/%d output_ts=[%d %d]', max(nets{1}.sets.D_CC_LIM(:)), nets{1}.sets.ncc, nets{1}.sets.nhidden_per, round(nets{1}.sets.S_LIM/nets{1}.sets.dt));
@@ -29,8 +28,11 @@ function fig_handles = r_plot_similarity(nets, sim, simstats, lagstats, figs)
 
         for pti=1:npattypes
             subplot(1, npattypes, pti); set(gca, 'FontSize', 16);
-            data_mean = squeeze(simstats(:, :, pti, 7 + (fi-1)));
-            plot(repmat(1:tsteps, [nlocs/2 1])', data_mean, 'LineWidth', 2);
+
+            data_mean = squeeze(simstats.mean(:, :, pti, 7 + (fi-1)));
+            data_ste = squeeze(simstats.std(:, :, pti, 7 + (fi-1))) / sqrt(simstats.nsims);
+
+            errorbar(repmat(1:tsteps, [nlocs/2 1])', data_mean, data_ste, 'LineWidth', 2);
 
             legend(labels, 'Location', 'NorthWest');
             title(strrep([title_addendum ' ' pat_types{pti}], '_', '\_'));
@@ -43,9 +45,9 @@ function fig_handles = r_plot_similarity(nets, sim, simstats, lagstats, figs)
     %% Figure 4
     if ismember(4, figs)
         fig_handles(end+1) = figure('name', 'xcorr', 'Position', [ 72         -21        1209         794]);
-        lag_mean = mean(lagstats, 1);
-        lag_stde = std(lagstats, [], 1) / sqrt(size(lagstats, 1));
-        ntimes = size(lag_stde, 2);
+        lag_mean = lagstats.mean;%, 1);
+        lag_stde = lagstats.std / sqrt(lagstats.nsims);
+        ntimes = length(lag_stde);
         lag_times = [1:ntimes] - (ntimes + 1) / 2;
         errorbar(lag_times, lag_mean, lag_stde);
         xlabel('time lag');
@@ -65,8 +67,8 @@ function fig_handles = r_plot_similarity(nets, sim, simstats, lagstats, figs)
         for pti=1:npattypes
 
             subplot(2, npattypes, pti);
-            data_mean = squeeze(simstats(:, :, pti, 1));
-            data_sde = squeeze(simstats(:, :, pti, 2))/sqrt(nsims);
+            data_mean = squeeze(simstats.mean(:, :, pti, 1));
+            data_sde = squeeze(simstats.std(:, :, pti, 2))/sqrt(nsims);
             errorbar(repmat(1:tsteps, [nlocs/2 1])', data_mean, data_ste, 'LineWidth', 2);
 
             legend(labels);
@@ -74,8 +76,8 @@ function fig_handles = r_plot_similarity(nets, sim, simstats, lagstats, figs)
             if pti == 1, ylabel('Mean difference of similarity from input.'); end;
 
             subplot(2, npattypes, pti+1);
-            data_mean = squeeze(simstats(:, :, pti, 3));
-            data_sde = squeeze(simstats(:, :, pti, 4))/sqrt(nsims);
+            data_mean = squeeze(simstats.mean(:, :, pti, 3));
+            data_sde = squeeze(simstats.std(:, :, pti, 4))/sqrt(nsims);
             errorbar(repmat(1:tsteps, [nlocs/2 1])', data_mean, data_ste, 'LineWidth', 2);
 
             legend(labels);
@@ -96,8 +98,8 @@ function fig_handles = r_plot_similarity(nets, sim, simstats, lagstats, figs)
         ih_idx = find(cellfun(@(x) ~isempty(x), regexp('ih$', labels)));
         cc_idx = find(cellfun(@(x) ~isempty(x), regexp('cc$', labels)));
         for pti=1:npattypes
-            data_mean = squeeze(simstats(:, :, pti, 5));
-            data_std = squeeze(simstats(:, :, pti, 6));
+            data_mean = squeeze(simstats.mean(:, :, pti, 5));
+            data_std = squeeze(simstats.std(:, :, pti, 6));
             cur_labels = labels;
 
             if length(ih_idx) == 1 && length(cc_idx) == 1
