@@ -133,7 +133,7 @@ function [net] = r_massage_params(net)
     if (~isfield(sets,'wt_wts')),    sets.wt_wts      = 0;          end;
     if (~isfield(sets,'verbose')),   sets.verbose     = false;      end;
     if (~isfield(sets,'test_freq')), sets.test_freq   = 100;        end;
-    if (~isfield(sets, 'test_fn')),  sets.test_fn     = 'r_record_lesion_performance'; end;
+    if (~isfield(sets,'test_fn')),  sets.test_fn     = 'r_record_lesion_performance'; end;
     % 
     if (~isfield(sets,'online')),    sets.online      = false;      end;
     if (~isfield(sets,'bias_val')),  sets.bias_val    = 1;          end;
@@ -174,7 +174,7 @@ function [net] = r_massage_params(net)
 
     % Make a filename for saving
     if (~isfield(sets,'matfile'))
-        sets.matfile = sprintf('%s_t%d_d%d_r%d_%s',sets.dataset,sets.tsteps,max(sets.D_CC_INIT(:)),sets.rseed, r_get_hash(sets));
+        sets.matfile = sprintf('%s_t%d_d%d_r%d_%s',sets.dataset, sets.tsteps, sets.rseed, r_get_hash(sets));
         if (isfield(sets,'autoencoder') && sets.autoencoder)
           sets.matfile = [sets.matfile '-ac'];
         end;
@@ -188,18 +188,29 @@ function [net] = r_massage_params(net)
     net.fn   = fn;
     
 
-function h = r_get_hash(sets)
-    origString = r_dump_sets(sets);
+function h = r_get_hash(sets, sets_to_skip)
+    if ~exist('sets_to_skip')
+        sets_to_skip = {
+            'force', ...
+            'verbose', ...
+            'test_freq', ...
+            'test_fn', ...
+            'dirname', 'matfile', ...
+            'n_nets' ...
+        };
+        if sets.ncc == 0, sets_to_skip(end+1:end+3) = {'D_CC_INIT', 'D_CC_LIM'}; end;
+    end;
+
+    origString = r_dump_sets(sets, sets_to_skip);
     h = sprintf('%d', round( sum(origString.*[1:5:5*length(origString)]) ));
     
-function [str] = r_dump_sets(sets)
+function [str] = r_dump_sets(sets, sets_to_skip)
     
     str = '';
     a = fields(sets);
     for ai=1:length(a)
         % Skip settings that we know will break across machines
-        if any(strcmp(a{ai}, {'dirname', 'matfile'})), continue; end;
-        if any(strcmp(a{ai}, {'n_nets'})), continue; end;
+        if any(strcmp(a{ai}, sets_to_skip)), continue; end;
         
         v = sets.(a{ai});
         str = [str '%s: ' a{ai}]; 
