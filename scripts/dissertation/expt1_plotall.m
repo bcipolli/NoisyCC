@@ -6,7 +6,9 @@ cache_file = fullfile(expt1_dir, 'expt1_cache.mat')
 
 
 %% Noise dependence: 10 time-steps
-for fi=r_plot_ringo_figures(fullfile(expt1_dir, 'expt1_nonoise_10'), fullfile(expt1_dir, 'expt1_noise_10_1'), [0.4 0.6 0.8 1.4 1.6 1.8 2.2], cache_file)
+cdata, ndata, ts
+[cdata, ndata, ts] = r_collect_two_datasets(fullfile(cogsci_dir, 'expt1_nonoise_10'), fullfile(cogsci_dir, 'expt1_noise_10_1'), cache_file);
+for fi=r_plot_ringo_figures(cdata, ndata, ts, [0.4 0.6 0.8 1.4 1.6 1.8 2.2])
 %    figure(fi);
 %    title('Learning Trajectory (delay=10 time-steps)');
 %    [~,~,oh] = legend();
@@ -16,7 +18,8 @@ return
 
 
 %% Noise dependence: 2 time-steps
-for fi=r_plot_ringo_figures(fullfile(expt1_dir, 'nonoise_2'), fullfile(expt1_dir, 'noise_2_1'), [0.4 0.8], cache_file)
+[cdata, ndata, ts] = r_collect_two_datasets(fullfile(cogsci_dir, 'nonoise_2'), fullfile(cogsci_dir, 'noise_2_1'), cache_file);
+for fi=r_plot_ringo_figures(cdata, ndata, ts, [0.4 0.8])
     figure(fi);
     title('Learning Trajectory (delay=2 time-steps)');
 %    [~,~,oh] = legend();
@@ -26,7 +29,8 @@ end;
 %% Time dependence: control
 
 % % wrongly classified
-for fi=r_plot_ringo_figures(fullfile(expt1_dir, 'expt1_nonoise_2'), fullfile(expt1_dir, 'expt1_nonoise_10'), [0.4 0.8], cache_file)
+[cdata, ndata, ts] = r_collect_two_datasets(fullfile(cogsci_dir, 'expt1_nonoise_2'), fullfile(cogsci_dir, 'expt1_nonoise_10'), cache_file);
+for fi=r_plot_ringo_figures(cdata, ndata, ts, [0.4 0.8])
     figure(fi);
     [~,~,oh] = legend();
     title('Learning Trajectory (control)');
@@ -36,7 +40,8 @@ end;
 %% Time dependence: noise
 
 % % wrongly classified
-for fi=r_plot_ringo_figures(fullfile(expt1_dir, 'expt1_noise_2_1'), fullfile(expt1_dir, 'expt1_noise_10_2'), [0.4 0.8], cache_file)
+[cdata, ndata, ts] = r_collect_two_datasets(fullfile(cogsci_dir, 'expt1_noise_2_1'), fullfile(cogsci_dir, 'expt1_noise_10_2'), cache_file);
+for fi=r_plot_ringo_figures(cdata, ndata, ts, [0.4 0.8])
     figure(fi);
     title('Learning Trajectory (noise)');
     [~,~,oh] = legend();
