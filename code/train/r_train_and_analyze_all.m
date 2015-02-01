@@ -125,11 +125,16 @@ function [sims, simstats, lagstats, idx] = r_group_analyze(sets, datas)
     idx.built   = cellfun(@(d) ~isfield(d, 'ex') && isfield(d, 'actcurve'), datas);
     idx.trained = cellfun(@(d) isfield(d, 'good_update') && (length(d.good_update) < sets.niters || nnz(~d.good_update) == 0), datas);
     idx.good    = idx.built & idx.trained;
+    idx.good
 
     sims          = cellfun(@(d) d.sims,     datas(idx.good), 'UniformOutput', false);
 
     simstats_tmp  = cellfun(@(d) d.simstats, datas(idx.good), 'UniformOutput', false);
-    simstats     = mean(cat(5, simstats_tmp{:}), 5);
+    simstats.mean = mean(cat(5, simstats_tmp{:}), 5);
+    simstats.std  = std(cat(5, simstats_tmp{:}), [], 5);
+    simstats.nsims = sum(idx.good);
 
-    lagstats_tmp  = cellfun(@(d) d.lagstats.a, datas(idx.good), 'UniformOutput', false);
-    lagstats     = mean(cat(3, lagstats_tmp{:}), 3);
+    lagstats_tmp  = cellfun(@(d) mean(d.lagstats.a, 1)', datas(idx.good), 'UniformOutput', false);
+    lagstats.mean = mean(cat(2, lagstats_tmp{:}), 2);
+    lagstats.std = std(cat(2, lagstats_tmp{:}), [], 2);
+    lagstats.nsims = sum(idx.good);

@@ -47,7 +47,7 @@ function [net, pats, data] = r_train_and_analyze_one(sets, rseed, save_data)
             [data.an] = r_analyze_training(net, pats, data);
             changed = true;
         end;
-        if any(~isfield(data, {'sims', 'simstats', 'lagstats'})) % Always analyze similarities
+        if ~all(isfield(data, {'sims', 'simstats', 'lagstats'})) % Always analyze similarities
             [data.sims, data.simstats, data.lagstats] = r_analyze_similarity(net, pats, data);
             changed = true;
         end;

@@ -22,17 +22,27 @@ function [sim, simstats, lagstats] = r_compute_similarity(net, pats, sim_measure
     if ~exist('timelag', 'var'), timelag = 0; end;
 
     if iscell(net)
-        % Received multiple networks; loop over them and average.
+        % M(1) = x(1), M(k) = M(k-1) + (x(k) - M(k-1)) / k
+        % S(1) = 0, S(k) = S(k-1) + (x(k) - M(k-1)) * (x(k) - M(k))
+        mean_update = @(xk, Mkm1, k) (Mkm1 + (xk-Mkm1)/k);
+        std_update = @(xk, Skm1, Mk, Mkm1) ( Skm1 + (xk - Mkm1) .* (xk - Mk) );
+
+        % Received multiple networks; loop over them and average,
+        %  record a final row for all.
         sims = cell(numel(net), 1);
         simstats_s = cell(numel(net), 1);
         simstats = 0;
         for ni=1:numel(net)
             fprintf('Processing %d of %d...', ni, numel(net));
             [sims{ni}, simstats_s{ni}] = r_compute_similarity(net{ni}, pats, sim_measure);
-            %sim = sim + sims{ni}/numel(net);
-            simstats = simstats + simstats_s{ni}/numel(net);
             fprintf('done.\n');
+            %sim = sim + sims{ni}/numel(net);
+            
+            new_simstats = mean_update(simstats_s{ni}, simstats, ni);
+            simstats_std = std_update(simstats_s{ni}, simstats_std, new_simstats, simstats);
+            simstats = new_simstats;
         end;
+        simstats(:, :, :, end+1:end+3) = sqrt(simstats_std(:, :, :, 7:9) / (numel(net)-1));
         sim = sims;
         return;
     end;
@@ -111,12 +121,13 @@ function [sim, simstats, lagstats] = r_compute_similarity(net, pats, sim_measure
                 patsim_asymmetry_input_corr  = corr(rh_simdiff_input', lh_simdiff_input');% ./ patsim_hemimean;
                 patsim_asymmetry_output_corr = corr(rh_simdiff_output', lh_simdiff_output');% ./ patsim_hemimean;
 
-                measurements = [1-patsim_asymmetry_corr mean(abs(patsim_asymmetry))];
-                diff_sign = diff(sign(measurements)) ~= 0 && abs(diff(measurements)) > 0.1;
-                diff_mag = abs(diff(measurements)) > 0.25;
-
-                if ~all(isnan(patsim_asymmetry)) && ~isnan(patsim_asymmetry_corr) && (diff_sign || diff_mag)
-                    %fprintf('\n%2d: %s corr & avg differ %.2f vs %.2f\n', ti, loc, (1-patsim_asymmetry_corr), mean(abs(patsim_asymmetry)));
+                if false %% debug checks
+                    measurements = [1-patsim_asymmetry_corr mean(abs(patsim_asymmetry))];
+                    diff_sign = diff(sign(measurements)) ~= 0 && abs(diff(measurements)) > 0.1;
+                    diff_mag = abs(diff(measurements)) > 0.25;
+                    if ~all(isnan(patsim_asymmetry)) && ~isnan(patsim_asymmetry_corr) && (diff_sign || diff_mag)
+                        %fprintf('\n%2d: %s corr & avg differ %.2f vs %.2f\n', ti, loc, (1-patsim_asymmetry_corr), mean(abs(patsim_asymmetry)));
+                    end;
                 end;
 
                 % Filter only the patterns we wish to include in the similarity computation
@@ -178,12 +189,14 @@ function [sim, simstats, lagstats] = r_compute_similarity(net, pats, sim_measure
             [a(ci,:), b] = xcorr(rh_sim(:,ci), lh_sim(:,ci));
         end;
 
-        fig_name = sprintf('delay=%d', max(net.sets.D_LIM(:)));
-        figure('name', fig_name);
-        plot(b, mean(a,1));
-        xlabel('lag (timesteps)');
-        ylabel('xcorr');
-        title(fig_name);
-        %print(gcf, sprintf('xcorr-%s.png', fig_name), '-dpng');
+        if false  % debug-only figure
+            fig_name = sprintf('delay=%d', max(net.sets.D_LIM(:)));
+            figure('name', fig_name);
+            plot(b, mean(a,1));
+            xlabel('lag (timesteps)');
+            ylabel('xcorr');
+            title(fig_name);
+            %print(gcf, sprintf('xcorr-%s.png', fig_name), '-dpng');
+        end;
     end;
     lagstats = struct('a', a, 'b', b);
