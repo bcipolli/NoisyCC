@@ -62,7 +62,7 @@ function [nets, pats, datas, figs] = r_train_and_analyze_all(template_net, nexam
 
     % Plot some summary figures
     figs = [];
-    figs = [figs r_plot_training_figures(nets, datas, vals, nexamples, summary_figs)];
+    figs = [figs r_plot_training_stats(nets, datas, vals, nexamples, summary_figs)];
     figs = [figs r_plot_interhemispheric_surfaces(nets, datas, vals, summary_figs)];
     figs = [figs r_plot_similarity_surfaces(nets, vals, simstats, lagstats, summary_figs)];
 
