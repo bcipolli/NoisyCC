@@ -143,13 +143,13 @@ function [sim, simstats, lagstats] = r_compute_similarity(net, pats, sim_measure
                 %   helps characterize what's going on with the network.
                 % xxxx patsim_crosshemi tells how similar the representations
                 % xxxx  are across the hemispheres, directly.
-                simstats(ti, li, pti, 1) = nanmean(abs(patsim_hemimean_input(pattype_idx)));
-                simstats(ti, li, pti, 2) = nanstd (abs(patsim_hemimean_input(pattype_idx)));
-                simstats(ti, li, pti, 3) = nanmean(abs(patsim_hemimean_output(pattype_idx)));
-                simstats(ti, li, pti, 4) = nanstd (abs(patsim_hemimean_output(pattype_idx)));
+                simstats(ti, li, pti, 1) = nanmean(abs(patsim_hemimean_input(pattype_idx)));  % mean difference vs input (mean)
+                simstats(ti, li, pti, 2) = nanstd (abs(patsim_hemimean_input(pattype_idx)));  % (std)
+                simstats(ti, li, pti, 3) = nanmean(abs(patsim_hemimean_output(pattype_idx))); % mean difference vs output (mean)
+                simstats(ti, li, pti, 4) = nanstd (abs(patsim_hemimean_output(pattype_idx))); % (std)
 
-                simstats(ti, li, pti, 5) = nanmean(abs(patsim_asymmetry(pattype_idx)));
-                simstats(ti, li, pti, 6) = nanstd(abs(patsim_asymmetry(pattype_idx)));
+                simstats(ti, li, pti, 5) = nanmean(abs(patsim_asymmetry(pattype_idx)));  % absolute asymm (mean)
+                simstats(ti, li, pti, 6) = nanstd(abs(patsim_asymmetry(pattype_idx)));   % (std)
 
                 % corr is a measure of similarity; we want dissimilarity.  Keep the sign to indicate anti-correlation
                 simstats(ti, li, pti, 7) = sign(patsim_asymmetry_input_corr)  * (1-abs(patsim_asymmetry_input_corr)); %
@@ -184,6 +184,6 @@ function [sim, simstats, lagstats] = r_compute_similarity(net, pats, sim_measure
         xlabel('lag (timesteps)');
         ylabel('xcorr');
         title(fig_name);
-        print(gcf, sprintf('xcorr-%s.png', fig_name), '-dpng');
+        %print(gcf, sprintf('xcorr-%s.png', fig_name), '-dpng');
     end;
     lagstats = struct('a', a, 'b', b);
