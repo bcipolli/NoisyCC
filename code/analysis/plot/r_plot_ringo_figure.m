@@ -1,4 +1,4 @@
-function fs=tdlc2013_figures(data_path, plots, intype, etype, cache_file)
+function fs=r_plot_ringo_figure(data_path, plots, intype, etype, cache_file)
 % data_path: directory of all raw data.  OR, a pointer to the cache file.
 % intype: all, inter, intra
 % etype : clserr, err (sse)

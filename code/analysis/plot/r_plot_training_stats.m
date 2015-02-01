@@ -1,4 +1,4 @@
-function [fh] = r_plot_training_figures(nets, datas, vals, nexamples, figs)
+function [fh] = r_plot_training_stats(nets, datas, vals, nexamples, figs)
     if ~exist('figs', 'var'), figs = {'lesion', 'niters'}; end;
 
     fh = [];
