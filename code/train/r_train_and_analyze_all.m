@@ -2,14 +2,16 @@ function [nets, pats, datas, figs] = r_train_and_analyze_all(template_net, nexam
                                                              nccs, delays, Ts, ...
                                                              loop_figs, summary_figs, ...
                                                              results_dir, output_types)
-%
+%    ncc
+%   delays
+%   Ts: decay constants
 
     %% Initialize environment and directories.
     if ~exist('nexamples', 'var'), nexamples = 10; end;
     if ~exist('nccs', 'var'), nccs = [template_net.sets.ncc]; end;
-    if ~exist('delays', 'var'), delays = unique(template_net.sets.D_CC_INIT); end;
-    if ~exist('Ts', 'var'), Ts = unique(template_net.sets.T_INIT) / template_net.sets.dt; end;
-    if ~exist('loop_figs', 'var'), loop_figs = []; end;
+    if ~exist('delays', 'var'), delays = max(template_net.sets.D_CC_INIT(:)); end;
+    if ~exist('Ts', 'var'), Ts = max(template_net.sets.T_INIT(:)); end;
+    if ~exist('loop_figs', 'var'), loop_figs = [1:4]; end;
     if ~exist('summary_figs', 'var'), summary_figs = [0 1 2]; end;
     if ~exist('output_types', 'var'), output_types = {'png'}; end;
     if ~exist('results_dir', 'var'),
@@ -59,9 +61,10 @@ function [nets, pats, datas, figs] = r_train_and_analyze_all(template_net, nexam
     if isempty(vals), return; end;
 
     % Plot some summary figures
-    r_plot_training_figures(nets, datas, vals, nexamples, summary_figs);
-    r_plot_interhemispheric_surfaces(nets, datas, vals, summary_figs);
-    r_plot_similarity_surfaces(nets, vals, simstats, lagstats, summary_figs);
+    figs = [];
+    figs = [figs r_plot_training_figures(nets, datas, vals, nexamples, summary_figs)];
+    figs = [figs r_plot_interhemispheric_surfaces(nets, datas, vals, summary_figs)];
+    figs = [figs r_plot_similarity_surfaces(nets, vals, simstats, lagstats, summary_figs)];
 
     guru_saveall_figures( ...
         results_dir, ...

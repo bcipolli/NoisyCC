@@ -1,17 +1,17 @@
-function r_plot_similarity_surfaces(nets, vals, simstats, lagstats, figs)
+function [fh] = r_plot_similarity_surfaces(nets, vals, simstats, lagstats, figs)
 
     if ~iscell(nets), nets = { nets }; end;
     if ~exist('figs', 'var'), figs = [2]; end;
 
     switch vals.dims.nvaried
-        case 0, warning('No valid networks were trained, so no plots can be made.'); return;
-        case 1, r_plot_similarity_surfaces_1D(nets, vals, simstats, lagstats, [], 9, figs); % 5=mean, 9=corr
-        case 2, r_plot_similarity_surfaces_2D(nets, vals, simstats, lagstats, 9, figs);
+        case 0, fh = []; % no-op; a single network was trained.%warning('No valid networks were trained, so no plots can be made.'); return;
+        case 1, fh = r_plot_similarity_surfaces_1D(nets, vals, simstats, lagstats, [], 9, figs); % 5=mean, 9=corr
+        case 2, fh = r_plot_similarity_surfaces_2D(nets, vals, simstats, lagstats, 9, figs);
         otherwise, error('NYI');
     end;
 
 
-function r_plot_similarity_surfaces_2D(nets, vals, simstats, lagstats, data_plotted, figs)
+function fh = r_plot_similarity_surfaces_2D(nets, vals, simstats, lagstats, data_plotted, figs)
     if ~exist('data_plotted', 'var'), data_plotted = 5; end;
     if ~exist('figs', 'var'), figs = []; end;
 
@@ -88,7 +88,7 @@ function r_plot_similarity_surfaces_2D(nets, vals, simstats, lagstats, data_plot
     end;
 
 
-function r_plot_similarity_surfaces_1D(nets, vals, simstats, lagstats, dim_id, data_plotted, figs)
+function fh = r_plot_similarity_surfaces_1D(nets, vals, simstats, lagstats, dim_id, data_plotted, figs)
 % When we vary on just one dimension, show as a surface plot vs. time
 
     if ~exist('data_plotted', 'var'), data_plotted = 5; end;
@@ -97,6 +97,9 @@ function r_plot_similarity_surfaces_1D(nets, vals, simstats, lagstats, dim_id, d
         guru_assert(vals.dims.nvaried == 1);
         dim_id = vals.dims.ids{1};
     end;
+
+    fh = []; % figure handles
+
     dim_name = vals.dims.names{strcmp(vals.dims.ids, dim_id)};
 
     yvals = sort(vals.(dim_id));
@@ -113,7 +116,7 @@ function r_plot_similarity_surfaces_1D(nets, vals, simstats, lagstats, dim_id, d
         lagdata = r_distill_data(simstats, dim_id, vals, pti, data_plotted);
 
         if ismember(1, figs)
-            f1h = figure('name', 'f1h', 'Position', [ 0  0 1000*ncols  600*nrows]);
+            fh(end+1) = figure('name', 'f1h', 'Position', [ 0  0 1000*ncols  600*nrows]);
             for rowi=1:nrows
                 for coli=1:ncols
                     ploti = coli + ncols*(rowi-1);
@@ -138,7 +141,7 @@ function r_plot_similarity_surfaces_1D(nets, vals, simstats, lagstats, dim_id, d
         end;
 
         if ismember(2, figs)
-            f2h = figure('name', 'f2h', 'Position', [ 0  0 600*ncols  600*nrows]);
+            fh(end+1) = figure('name', 'f2h', 'Position', [ 0  0 600*ncols  600*nrows]);
             for rowi=1:nrows
                 for coli=1:ncols
                     ploti = coli + ncols*(rowi-1);
@@ -161,14 +164,7 @@ function r_plot_similarity_surfaces_1D(nets, vals, simstats, lagstats, dim_id, d
                 end;
             end;
         end;
-
-        %if true || ismember(3, figs)
-        %    keyboard
-        %end;
     end;
-
-    if exist('f1h', 'var'), set(f1h, 'Position', [ 0  0 500*ncols  600*nrows]), end;
-    if exist('f2h', 'var'), set(f2h, 'Position', [ 0  0 600*ncols  600*nrows]), end;
 
 
 function [locs] = r_get_locs(vals)

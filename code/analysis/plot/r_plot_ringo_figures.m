@@ -191,8 +191,8 @@ function f = plot_hu_sim(cdata, ndata, lbl)
         set(gca, 'xtick',[],'ytick',[]);
         title('output similarity');
     end;
-    
-    
+
+
     % take the dot product for each, then take the mean of the result.
     no_nan = @(d) (d(~isnan(d)));
     mean_dotted = @(d1, d2) (mean(sum( d1./sqrt(sum(d1.^2, 2)) .* d2./sqrt(sum(d2.^2, 2)), 2)));
