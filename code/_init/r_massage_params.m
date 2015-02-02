@@ -133,7 +133,7 @@ function [net] = r_massage_params(net)
     if (~isfield(sets,'wt_wts')),    sets.wt_wts      = 0;          end;
     if (~isfield(sets,'verbose')),   sets.verbose     = false;      end;
     if (~isfield(sets,'test_freq')), sets.test_freq   = 100;        end;
-    if (~isfield(sets,'test_fn')),  sets.test_fn     = 'r_record_lesion_performance'; end;
+    if (~isfield(sets,'test_fn')),   sets.test_fn     = @r_record_lesion_performance; end;
     % 
     if (~isfield(sets,'online')),    sets.online      = false;      end;
     if (~isfield(sets,'bias_val')),  sets.bias_val    = 1;          end;
