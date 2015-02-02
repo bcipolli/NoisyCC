@@ -14,9 +14,10 @@ function net = dissertation_args(tsteps, Idel, Idur, Sdel, Sdur)
     if ~exist('Idel', 'var')   || isempty(Idel),   Idel   = 1; end;
     if ~exist('Idur', 'var')   || isempty(Idur),   Idur   = 6; end;
     if ~exist('Sdel', 'var')   || isempty(Sdel),   Sdel   = 0; end;
-    if ~exist('Sdur', 'var')   || isempty(Sdur),   Sdur   = 1; end;
+    if ~exist('Sdur', 'var')   || isempty(Sdur),   Sdur   = 5; end;
 
     net.sets.rseed = 289;
+    net.sets.force = true;
 
     %training parameters
     net.sets.niters          = 1000; %training iterations

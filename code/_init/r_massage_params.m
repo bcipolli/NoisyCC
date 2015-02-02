@@ -174,7 +174,7 @@ function [net] = r_massage_params(net)
 
     % Make a filename for saving
     if (~isfield(sets,'matfile'))
-        sets.matfile = sprintf('%s_t%d_d%d_r%d_%s',sets.dataset, sets.tsteps, sets.rseed, r_get_hash(sets));
+        sets.matfile = sprintf('%s_t%d_r%d_%s',sets.dataset, sets.tsteps, sets.rseed, r_get_hash(sets));
         if (isfield(sets,'autoencoder') && sets.autoencoder)
           sets.matfile = [sets.matfile '-ac'];
         end;
@@ -198,7 +198,7 @@ function h = r_get_hash(sets, sets_to_skip)
             'dirname', 'matfile', ...
             'n_nets' ...
         };
-        if sets.ncc == 0, sets_to_skip(end+1:end+3) = {'D_CC_INIT', 'D_CC_LIM'}; end;
+        if sets.ncc == 0, sets_to_skip(end+1:end+2) = {'D_CC_INIT', 'D_CC_LIM'}; end;
     end;
 
     origString = r_dump_sets(sets, sets_to_skip);

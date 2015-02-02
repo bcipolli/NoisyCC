@@ -11,7 +11,7 @@ function [net, pats, data] = r_train_and_analyze_one(sets, rseed, save_data)
     matfile = fullfile(net.sets.dirname, net.sets.matfile);
 
     %% Load from cache
-    if exist(matfile, 'file')
+    if exist(matfile, 'file') && ~guru_getfield(sets, 'force', false)
         fprintf('Loading cached file %s...', matfile);
         load(matfile);
         fprintf(' done.\n');
