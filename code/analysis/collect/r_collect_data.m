@@ -166,106 +166,12 @@ function [an,sets] = r_collect_data(dirname, resave)
     sum_act_intact = sum(sum(b.data.hu_pat, 3), 2);  % sum over everything but time
     last_iter_idx = find(sum_act_intact, 1, 'last');
     act_intact = squeeze(b.data.hu_pat(last_iter_idx, :, :));  % patterns x hidden units
-
-    if ~isempty(act_lesion)
-        an.all.lesion.rh_sim(bi,:) = pdist(act_lesion(:, rh_idx), 'correlation');
-        an.all.lesion.lh_sim(bi,:) = pdist(act_lesion(:, lh_idx), 'correlation');
-        if has_intra
-            an.intra.lesion.rh_sim(bi,:) = pdist(act_lesion(pats.idx.intra, rh_idx), 'correlation');
-            an.intra.lesion.lh_sim(bi,:) = pdist(act_lesion(pats.idx.intra, lh_idx), 'correlation');
-            an.inter.lesion.rh_sim(bi,:) = pdist(act_lesion(pats.idx.inter, rh_idx), 'correlation');
-            an.inter.lesion.lh_sim(bi,:) = pdist(act_lesion(pats.idx.inter, lh_idx), 'correlation');
-        end;
-    end;
-    
-    if ~isempty(act_intact)
-        an.all.intact.rh_sim(bi,:) = pdist(act_intact(:, rh_idx), 'correlation');
-        an.all.intact.lh_sim(bi,:) = pdist(act_intact(:, lh_idx), 'correlation');
-        if has_intra
-            an.intra.intact.rh_sim(bi,:) = pdist(act_intact(pats.idx.intra, rh_idx), 'correlation');
-            an.intra.intact.lh_sim(bi,:) = pdist(act_intact(pats.idx.intra, lh_idx), 'correlation');
-            an.inter.intact.rh_sim(bi,:) = pdist(act_intact(pats.idx.inter, rh_idx), 'correlation');
-            an.inter.intact.lh_sim(bi,:) = pdist(act_intact(pats.idx.inter, lh_idx), 'correlation');
-        end;
-    end;
     
     rh_in =  squeeze(b.pats.train.P(2,:,b.pats.idx.rh.in)); % avoid the bias term
     lh_in =  squeeze(b.pats.train.P(2,:,b.pats.idx.lh.in));
     rh_out =  squeeze(b.pats.train.d(1,:,b.pats.idx.rh.out));
     lh_out =  squeeze(b.pats.train.d(1,:,b.pats.idx.lh.out));
 
-    an.all.rh_in_sim = pdist(rh_in, 'correlation');
-    an.all.lh_in_sim = pdist(lh_in, 'correlation');
-    an.all.rh_out_sim = pdist(rh_out, 'correlation');
-    an.all.lh_out_sim = pdist(lh_out, 'correlation');
-
-
-%
-%
-%
-%
-%     for ti=1:length(an.ts.lesion)
-%
-%
-%
-%         b.data.hu_lesion
-%         b.data.hu_pat(an.ts.lesion(ti))
-%
-%         sum_act = sum(sum(b.data.hu_lesion, 3), 2);  % sum over everything but time
-%         act = squeeze(b.data.lesion.y(end,:,:));
-%
-%       fprintf('%d %d\n', bi, ti);
-%       rh_act = squeeze(b.data.lesion.y(end,:,rh_idx));
-%       rh_act(isnan(rh_act)) = 0;
-%       %rh_act_norm = rh_act-repmat(mean(rh_act,1),[size(rh_act,1) 1]);
-%       rh_sim = pdist(rh_act); % pat x output unit
-%
-%
-%       lh_act = squeeze(b.data.hu_lesion(end,:,lh_idx));
-%       if all(~lh_act(:))
-%           % Bug: early stopping and these didn't get copied over.
-%           guru_assert(b.data.niters < b.net.sets.niters);
-%           sum_act = sum(sum(b.data.hu_lesion, 3), 2);  % sum over everything but time
-%           idx = find(sum_act, 1, 'last');
-%           lh_act = squeeze(b.data.hu_lesion(idx,:,lh_idx));
-%       end;
-%
-%       an.all.lesion.rh_sim = pdist(squeeze(b.data.hu_lesion(end,:,rh_idx)));
-%       an.all.lesion.lh_sim = pdist(squeeze(b.data.hu_lesion(end,:,lh_idx)));
-%       an.intra.lesion.rh_sim = pdist(squeeze(b.data.hu_lesion(end,pats.idx.intra,rh_idx)));
-%       an.intra.lesion.lh_sim = pdist(squeeze(b.data.hu_lesion(end,pats.idx.intra,lh_idx)));
-%       an.inter.lesion.rh_sim = pdist(squeeze(b.data.hu_lesion(end,pats.idx.inter,rh_idx)));
-%       an.inter.lesion.lh_sim = pdist(squeeze(b.data.hu_lesion(end,pats.idx.inter,lh_idx)));
-%
-%       %vicente = @(x,y) ( trace( (x'*x)'*(y'*y') ) );
-%       %sim = @(x,y) ( vicente(x,y)/(vicente(y,y)*vicente(x,x)) );
-%       %/ trace( (y'*y)'*(y'*y) ) * trace((x'*x)'*(x'*x))
-%
-%       rh_act = squeeze(b.data.nolesion.y(end,:,rh_idx));
-%       rh_act(isnan(rh_act)) = 0;
-%       %rh_act_norm = rh_act-repmat(mean(rh_act,1),[size(rh_act,1) 1]);
-%       rh_sim = pdist(rh_act);%rh_act_norm * rh_act_norm';
-%
-%       lh_act = squeeze(b.data.nolesion.y(end,:,lh_idx));
-%       lh_act(isnan(lh_act)) = 0;
-%       %lh_act_norm = lh_act-repmat(mean(lh_act,1),[size(lh_act,1) 1]);
-%       lh_sim = pdist(lh_act);%rh_act_norm * rh_act_norm';
-%
-%       an.all.intact.rh_sim = rh_sim;
-%       an.all.intact.lh_sim = lh_sim;
-%       an.intra.intact.rh_sim = rh_sim(pats.idx.intra,pats.idx.intra);
-%       an.intra.intact.lh_sim = lh_sim(pats.idx.intra,pats.idx.intra);
-%       an.inter.intact.rh_sim = rh_sim(pats.idx.inter,pats.idx.inter);
-%       an.inter.intact.lh_sim = lh_sim(pats.idx.inter,pats.idx.inter);
-%
-      %rh_sim =  * squeeze(b.data.hu_lesion(1,:,rh_idx))';
-      %lh_sim = squeeze(b.data.hu_lesion(1,:,lh_idx)) * squeeze(b.data.hu_lesion(1,:,lh_idx))';
-      %an.all.lesion.hu_sim(ti,:) =  .* squeeze(b.data.hu_lesion(1,:,lh_idx))'; % left-right similarity
-      lr_D = net.D(net.idx.lh_cc,net.idx.rh_cc); rl_D = net.D(net.idx.rh_cc,net.idx.lh_cc);
-      all_d = [ lr_D(:); rl_D(:) ];
-      an.D.cc_bins = [min(net.sets.D_CC_INIT(:)):max(net.sets.D_CC_INIT(:))];
-      an.D.cc_dist = hist( all_d, an.D.cc_bins );
-    %end;
   end;
 
  % convert cell array to struct array
@@ -295,50 +201,5 @@ function [an,sets] = r_collect_data(dirname, resave)
           end;
           b.data.E_pat = b.data.E_pat/b.net.sets.dt;
 
-          % reconstruct indices, for symmetric/asymmetric experiments
-          if ~isfield(b.pats.idx, 'intra')
-              b.pats.idx.intra = 1:b.pats.train.npat;
-              b.pats.idx.inter = [];
-              if resave,
-                  net=b.net; pats=b.pats; data=b.data;
-                  fprintf('%d ', fi);
-                  save(fullfile(dirname, files(fi).name), 'net','pats','data');
-              end;
-              clear('net', 'pats', 'data');
-          end;
-
-          % reconstruct functions
-          if false
-              try
-                  b.net.fn.sse(1,1);
-              catch
-                  fprintf('reconstituting...\n');
-                  b.net.fn.sse  = @(y,d)   (0.5.*(y-d).^2);
-                  b.net.fn.Err  = @(y,d)   (b.net.fn.sse(y,d));
-                  b.net.fn.Errp = @(y,d,p) ((y-d).^p);
-                  b.net.fn.f      = @(x)    ((exp(x)-exp(-x)) ./ (exp(x)+exp(-x)));
-                  b.net.fn.fp     = @(x,fx) (1-fx.^2);
-                  b.net.fn.fo     = @(x)    (1.7159*(2 ./ (1 + exp(-2 * 2*x/3)) - 1));
-                  b.net.fn.fpo    = @(x,fx) (1.7159*2/3*(1 - (fx/1.7159).^2));
-              end;
-
-              % Paste on extra info, if not already there
-              if true || ~isfield(b.data, 'noise')
-                  net=b.net; pats=b.pats; data=b.data;
-                  data.an = r_analyze(net, pats, data);
-                  net.continue=true;
-                  net.sets.axon_noise=0;
-
-                  [net,pats_new,data_new] = r_train_one(net);
-                  data    = r_test(net, pats, data);
-                  data.an = r_analyze(net, pats, data);
-                  if resave,
-                      fprintf('%d ', fi);
-                      save(fullfile(dirname, files(fi).name), 'net','pats','data');
-                  end;
-                  clear('net', 'pats', 'data');
-              end;
-          end;
-    %fprintf('%d ', fi);
           blobs{end+1} = b;
       end;
