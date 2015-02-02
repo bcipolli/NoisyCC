@@ -1,4 +1,4 @@
-function [d,nts,noise,delay,folders] = r_collect_data_looped_tdlc(dirname, cache_file)
+function [d, nts, noise, delay, folders] = r_collect_data_looped_tdlc(dirname, cache_file)
 % Calls r_collect_data_looped, then parses out a few key properties.
 
 if ~exist('dirname','var'),    dirname    = 'runs'; end;

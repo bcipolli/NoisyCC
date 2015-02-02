@@ -1,4 +1,4 @@
-function [d,s,folders] = r_collect_data_looped(dirname, cache_file, prefix, force_load)
+function [d,s,folders] = r_collect_data_looped(dirname, cache_file, prefix, force_load, filter_fn)
 %
 % d: data
 % s: settings
@@ -7,7 +7,8 @@ function [d,s,folders] = r_collect_data_looped(dirname, cache_file, prefix, forc
 if ~exist('dirname','var'),    dirname    = 'runs'; end;
 if ~exist('cache_file','var'), cache_file = ''; end; % no caching
 if ~exist('prefix','var'),     prefix=''; end;
-if ~exist('force', 'var'),     force_load = true; end;
+if ~exist('force_load', 'var'),     force_load = true; end;
+if ~exist('filter_fn', 'var'), filter_fn = @(blob) (true); end;
 
 % Get all subfolders with given prefix
 if isempty(dirname)
@@ -26,7 +27,7 @@ for foi=1:length(folders)
     % Get the data 
     curdir = fullfile(dirname, folders{foi});
     fprintf('Processing [%s]...', curdir);
-    [d{foi},~,s{foi}] = r_get_cache_data(curdir, cache_file, force_load); % break the caching
+    [d{foi},~,s{foi}] = r_get_cache_data(curdir, cache_file, force_load, filter_fn); % break the caching
 %    d{foi} = d{foi}{1}; % strip off extra cell layer
 %    s{foi} = s{foi}{1};
     

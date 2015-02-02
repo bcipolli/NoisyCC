@@ -1,9 +1,8 @@
-function [cdata, ndata, ts] = r_collect_two_datasets(clean_dir, noise_dir, cache_file)
+function [cdata, ndata, ts] = r_collect_two_datasets(clean_dir, noise_dir, cache_file, filter_fn)
 
 % Defaults & scrubbing input
-%if ~exist('clean_dir', 'var'), clean_dir = 'nonoise.10'; end;
-%if ~exist('noise_dir', 'var'), noise_dir = 'noise.10.1'; end;
-if ~exist('cache_file', 'var'),cache_file= fullfile(guru_getOutPath('cache'),'cs2013_cache.mat'); end;
+if ~exist('cache_file', 'var'),cache_file= ''; end;
+if ~exist('filter_fn', 'var'), filter_fn = @(blob) (true); end;
 
-[cdata,ts] = r_get_cache_data(clean_dir, cache_file);
-[ndata]    = r_get_cache_data(noise_dir, cache_file);
+[cdata,ts] = r_get_cache_data(clean_dir, cache_file, filter_fn);
+[ndata]    = r_get_cache_data(noise_dir, cache_file, filter_fn);
