@@ -3,12 +3,13 @@ function data = r_record_lesion_performance(iter, net, pats, data)
 %
 % iter is empty => end.
 
-    lesion_iter = floor(abs(iter) / ns.test_freq);
+    lesion_iter = floor(abs(iter) / net.sets.test_freq);
 
     % Setup and cleanup
     if lesion_iter == 1
-        data.E_lesion   = inf(floor(net.sets.niters / ns.test_freq), pats.npat, net.noutput, 'single');           % error
-        data.hu_lesion  = inf(floor(net.sets.niters / ns.test_freq), pats.npat, net.nhidden, 'single');           % error
+        max_lesion_iters = floor(net.sets.niters / net.sets.test_freq);
+        data.E_lesion   = inf(max_lesion_iters, pats.npat, net.noutput, 'single');           % error
+        data.hu_lesion  = inf(max_lesion_iters, pats.npat, net.nhidden, 'single');           % error
     elseif iter < 1  % cleanup
         data.E_lesion    = data.E_lesion(1:lesion_iter, :, :);
         data.hu_lesion   = data.E_lesion(1:lesion_iter, :, :);
