@@ -1,4 +1,4 @@
-function fs=r_plot_ringo_figure(data, noiese, delay, nts, plots, intype, etype)
+function fs=r_plot_ringo_figure(data, noise, delay, nts, plots, intype, etype)
 % data_path: directory of all raw data.  OR, a pointer to the cache file.
 % intype: all, inter, intra
 % etype : clserr, err (sse)

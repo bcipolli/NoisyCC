@@ -8,7 +8,7 @@ if ~exist('prefix','var'), prefix='tdlc'; end;
 [d,~,folders] = r_collect_data_looped(dirname, cache_file, prefix);
 
 for foi=1:length(folders)
-    
+
     % Parse out particular properties
     [n] = sscanf(folders{foi},'tdlc2013_all-%dts-%dd');
     nts(foi) = n(1);   % # timesteps

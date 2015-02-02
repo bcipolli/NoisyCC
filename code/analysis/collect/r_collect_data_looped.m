@@ -15,7 +15,9 @@ if isempty(dirname)
     paths = r_load_cache_file(cache_file);
     folders = cellfun(@(d) guru_fileparts(d,'name'), paths, 'UniformOutput', false);
 else
-    folders = dir(fullfile(dirname, [prefix '*']));
+    search_string = fullfile(dirname, [prefix '*']);
+    fprintf('Collecting data from "%s"\n', search_string);
+    folders = dir(search_string);
     folders = folders([folders.isdir]);
     folders = setdiff({folders.name}, {'.','..'});
 end;
