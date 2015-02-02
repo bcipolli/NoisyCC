@@ -1,10 +1,18 @@
-function [an,sets] = r_collect_data(dirname, resave)
+function [an,sets] = r_collect_data(dirpath, filter_fn)
 %
+% Given a directory, load data and collect some statistics on it.
+%
+% dirpath: string
+%     path to the directory of files to load
+%
+% filter_fn: function
+%     returns true if a file should be kept, false otherwise
+%     receives the blob as loaded from the file.
 
-  if ~exist('resave','var'), resave = false; end;
-  if ~exist(dirname,'file'), error('Could not find directory: %s', dirname); end;
+  if ~exist('filter_fn', 'var'), filter_fn = @(blob) (true); end;
+  if ~exist(dirpath, 'file'), error('Could not find directory: %s', dirpath); end;
 
-  [an.n, blobs, sets] = load_data_blobs(dirname, resave);
+  [an.n, blobs, sets] = load_data_blobs(dirpath, filter_fn);
 
   %% Useful constants
   an.ts.niters = blobs{1}.net.sets.niters;
@@ -172,31 +180,37 @@ function [an,sets] = r_collect_data(dirname, resave)
     rh_out =  squeeze(b.pats.train.d(1,:,b.pats.idx.rh.out));
     lh_out =  squeeze(b.pats.train.d(1,:,b.pats.idx.lh.out));
 
+    lr_D = net.D(net.idx.lh_cc,net.idx.rh_cc); rl_D = net.D(net.idx.rh_cc,net.idx.lh_cc);
+    all_d = [ lr_D(:); rl_D(:) ];
+    an.D.cc_bins = [min(net.sets.D_CC_INIT(:)):max(net.sets.D_CC_INIT(:))];
+    an.D.cc_dist = hist( all_d, an.D.cc_bins );
   end;
 
  % convert cell array to struct array
  sets = [sets{:}];
 
 
+function [n, blobs, sets] = load_data_blobs(dirpath, filter_fn)
+      if ~exist('filter_fn', 'var'), filter_fn = @(blob) (true); end;
 
-
-
-
-
-  function [n, blobs, sets] = load_data_blobs(dirname, resave)
-      files = dir(fullfile(dirname,'*.mat'))
+      files = dir(fullfile(dirpath,'*.mat'))
       n = length(files);
 
       % Load all data
       warning('off','MATLAB:dispatcher:UnresolvedFunctionHandle');
-      blobs = {};%cell(n,1);
+      blobs = {};
       sets  = {};
       for fi=1:n
           try
-             b = load(fullfile(dirname, files(fi).name));
+             b = load(fullfile(dirpath, files(fi).name));
+             if isfield(b, 'ex') || isfield(b.data, 'ex')
+                 continue;
+             elseif not filter_fn(b)
+                 continue;
+             end;
           catch
             lasterr,
-            fprintf('Skipping %s\n', fullfile(dirname, files(fi).name));
+            fprintf('Skipping %s\n', fullfile(dirpath, files(fi).name));
             continue;
           end;
           b.data.E_pat = b.data.E_pat/b.net.sets.dt;

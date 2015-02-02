@@ -1,5 +1,5 @@
-function [data,ts,sets] = r_get_cache_data(dirs, cache_file, force_load)
-%function [data,ts] = r_get_cache_data(irs, cache_file, force_load)
+function [data,ts,sets] = r_get_cache_data(dirs, cache_file, filter_fn, force_load)
+%function [data,ts] = r_get_cache_data(irs, cache_file, filter_fn, force_load)
 %
 % Returns summarized data from the given directory.  It can come from 3
 %   places, searched in this order:
@@ -11,14 +11,32 @@ function [data,ts,sets] = r_get_cache_data(dirs, cache_file, force_load)
 %
 % If no cache file is specified, then step 2 is skipped.
 %
+% PARAMETERS
+% =============
 %
 % dirs: string, or cell array of strings.
-% cache_file:
+%     directories to load data from
+%
+% cache_file: string
+%     file to load previously loaded and computed data results from.
+%
+% filter_fn: function
+%     filter to decide whether a data blob is included from the directory specified.
+%
+% force_load: bool
+%     whether to use results from a global cache, or to re-get from disk.
 %
 %
-% data: summarized data blob
+% RETURNS
+% =============
+%
+% data: 
+%    summarized data blob
+%
 % ts : info about timesteps
+%
 % sets: settings cache
+%
 
     global g_data_cache g_dir_cache g_sets_cache;
     if isnumeric(g_dir_cache) % initialize kindly :)
@@ -29,6 +47,7 @@ function [data,ts,sets] = r_get_cache_data(dirs, cache_file, force_load)
 
     % Default loading
     if ~exist('cache_file','var'), cache_file = ''; end;
+    if ~exist('filter_fn', 'var'), filter_fn = @(blob) (true); end;
     if ~exist('force_load','var'), force_load = false; end;
     if ischar(dirs), dirs = {dirs}; end;
 
@@ -75,7 +94,7 @@ function [data,ts,sets] = r_get_cache_data(dirs, cache_file, force_load)
                   end;
 
                   % Load the data
-                  [g_data_cache{end+1},g_sets_cache{end+1}] = r_collect_data(d);
+                  [g_data_cache{end+1},g_sets_cache{end+1}] = r_collect_data(d, filter_fn);
                   [g_dir_cache(end+1)]                      = dirnames({d});
                 end;
 
@@ -90,7 +109,7 @@ function [data,ts,sets] = r_get_cache_data(dirs, cache_file, force_load)
 
     % Didn't find all
     if ~isempty(remain_dirs)
-        error('Couldn''t find some data in global cache, cache file, nor at speicfied location: %s', [remain_dirs{:}]);
+        error('Couldn''t find some data in global cache, cache file, nor at specified location: %s', [remain_dirs{:}]);
     end;
 
 
