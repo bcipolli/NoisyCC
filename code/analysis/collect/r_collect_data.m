@@ -57,14 +57,14 @@ function [an,sets] = r_collect_data(dirpath, filter_fn)
   an.inter.intact.rh_sim = nan(length(blobs), m(length(pats.idx.inter)));
   an.inter.intact.lh_sim = nan(length(blobs), m(length(pats.idx.inter)));
 
-  
+
   %% Loop and fill in data
   for bi=1:length(blobs)
     b = blobs{bi};
     data = b.data; pats = b.pats; net = b.net;
     sets{end+1} = net.sets;
     has_intra = false;
-    
+
     %% Weights
     an.all.weights.lh(bi,:,:) = net.w(b.net.idx.lh_ih, net.idx.lh_ih);
     an.all.weights.rh(bi,:,:) = net.w(b.net.idx.rh_ih, net.idx.rh_ih);
@@ -74,7 +74,7 @@ function [an,sets] = r_collect_data(dirpath, filter_fn)
         an.inter.weights.lh(bi,:,:) = net.w(b.net.idx.lh_cc, net.idx.lh_cc);
         an.inter.weights.rh(bi,:,:) = net.w(b.net.idx.rh_cc, net.idx.rh_cc);
     end;
-    
+
     %% Sum-squared error
     if has_intra
         an.intra.intact.err(bi,1:size(data.E_pat,1)) = squeeze(mean(mean(data.E_pat(:,pats.idx.intra,:),3),2))';
@@ -131,7 +131,7 @@ function [an,sets] = r_collect_data(dirpath, filter_fn)
         an.intra.lesion.err(bi,1:size(data.E_lesion,1)) = mean(mean(data.E_lesion(:,pats.idx.intra,:),3),2)';
         an.intra.lesion.clserr(bi,1:size(diff_lesion,1)) = mean(mean( diff_lesion(:,pats.idx.intra,:)>=net.sets.train_criterion, 3),2);
     end;
-    
+
     % Fake (propagate) values for early stopping
     if has_intra
         an.intra.intact.clserr(bi,size(diff_intact,1)+1:end) = an.intra.intact.clserr(bi,size(diff_intact,1));
@@ -151,7 +151,7 @@ function [an,sets] = r_collect_data(dirpath, filter_fn)
         an.intra.lei.cls = -(an.intra.intact.clserr(:,100:100:end) - an.intra.lesion.clserr);
         an.inter.lei.cls = -(an.inter.intact.clserr(:,100:100:end) - an.inter.lesion.clserr);
     end;
-    
+
     an.all.lei.clsmean = mean(an.all.lesion.clserr,1) - mean(an.all.intact.clserr(:,an.ts.lesion),1);
     an.all.lei.clsstd  = std(an.all.lesion.clserr,[],1) + std(an.all.intact.clserr(:,an.ts.lesion),[],1);
     an.all.lei.clssem  = guru_sem(an.all.lesion.clserr, 1) + guru_sem(an.all.intact.clserr(:,an.ts.lesion), 1);
@@ -174,7 +174,7 @@ function [an,sets] = r_collect_data(dirpath, filter_fn)
     sum_act_intact = sum(sum(b.data.hu_pat, 3), 2);  % sum over everything but time
     last_iter_idx = find(sum_act_intact, 1, 'last');
     act_intact = squeeze(b.data.hu_pat(last_iter_idx, :, :));  % patterns x hidden units
-    
+
     rh_in =  squeeze(b.pats.train.P(2,:,b.pats.idx.rh.in)); % avoid the bias term
     lh_in =  squeeze(b.pats.train.P(2,:,b.pats.idx.lh.in));
     rh_out =  squeeze(b.pats.train.d(1,:,b.pats.idx.rh.out));
@@ -201,19 +201,37 @@ function [n, blobs, sets] = load_data_blobs(dirpath, filter_fn)
       blobs = {};
       sets  = {};
       for fi=1:n
+          filepath = fullfile(dirpath, files(fi).name);
+          fprintf('Loading %s...', filepath);
+
           try
              b = load(fullfile(dirpath, files(fi).name));
              if isfield(b, 'ex') || isfield(b.data, 'ex')
+                 fprintf(' skipping exception.\n');
                  continue;
-             elseif not filter_fn(b)
+             elseif ~filter_fn(b)
+                 fprintf(' skipping from filter.\n');
                  continue;
              end;
+             fprintf(' done.\n');
           catch
-            lasterr,
-            fprintf('Skipping %s\n', fullfile(dirpath, files(fi).name));
+
+            fprintf(' skipping from exception: %s\n', lasterr);
             continue;
           end;
-          b.data.E_pat = b.data.E_pat/b.net.sets.dt;
+
+          % ????
+          %b.data.E_pat = b.data.E_pat/b.net.sets.dt;
+          if ~isfield(b.pats.idx, 'intra')
+              switch b.net.sets.dataset
+                  case {'parity_dual'}
+                      b.pats.idx.intra = [];
+                      b.pats.idx.inter = 1:b.pats.train.npat;
+                  otherwise
+                      b.pats.idx.inter = [];
+                      b.pats.idx.intra = 1:b.pats.train.npat;
+              end;
+          end;
 
           blobs{end+1} = b;
       end;
