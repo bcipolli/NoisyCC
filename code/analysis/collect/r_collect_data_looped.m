@@ -1,4 +1,4 @@
-function [d,s,folders] = r_collect_data_looped(dirname, cache_file, prefix, force_load, filter_fn)
+function [d,s,folders] = r_collect_data_looped(dirname, cache_file, prefix, filter_fn, force_load)
 %
 % d: data
 % s: settings
@@ -27,7 +27,7 @@ for foi=1:length(folders)
     % Get the data 
     curdir = fullfile(dirname, folders{foi});
     fprintf('Processing [%s]...', curdir);
-    [d{foi},~,s{foi}] = r_get_cache_data(curdir, cache_file, force_load, filter_fn); % break the caching
+    [d{foi},~,s{foi}] = r_get_cache_data(curdir, cache_file, filter_fn, force_load); % break the caching
 %    d{foi} = d{foi}{1}; % strip off extra cell layer
 %    s{foi} = s{foi}{1};
     
