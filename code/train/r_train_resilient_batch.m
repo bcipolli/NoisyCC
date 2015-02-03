@@ -72,7 +72,7 @@ function [net,data] = r_train_resilient_batch(net,pats,data)
     % Main Loop
     %%%%%%%%%%%%%%
     last_measure_ts = find(sum(sum(pats.s,3),2),1,'last'); % keep an index of the last measurement point
-    test_fn = guru_iff(isfield(ns, 'test_fn'), ns.test_fn, @(i,n,p,d) d);
+    test_fn = guru_iff(isfield(net.fn, 'net_test'), net.fn.net_test, @(i,n,p,d) d);
 
     if (ns.verbose), r_print_pats(data); end;
 
