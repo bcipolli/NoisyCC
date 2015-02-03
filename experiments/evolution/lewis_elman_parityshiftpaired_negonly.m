@@ -17,4 +17,4 @@ net.sets.alpha_w     = 0.5;       %momentum
 ncc = linspace(net.sets.nhidden_per, 0, 6);
 delays = [1 5 10 15 20];
 
-r_train_and_analyze_all(net, 10, ncc, delays);
+r_train_and_analyze_all_by_sequence(net, 10, ncc, delays);

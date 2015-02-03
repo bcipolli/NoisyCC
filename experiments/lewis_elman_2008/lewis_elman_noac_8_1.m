@@ -67,7 +67,7 @@ end;
 
 %
 if net.sets.run
-    r_train_and_analyze_all(net, 10); % run 25 network instances
+    r_train_and_analyze_all_by_sequence(net, 10); % run 25 network instances
     %[net,pats,data]          = r_train_one(net);
     %[data.an]                = r_analyze(net, pats, data);
 end;

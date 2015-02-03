@@ -53,4 +53,4 @@ net.sets.nhidden_per      = 10;
 %net.sets.noise_input      = 0;%001;%1;
 
 %
-[nets, pats, datas] = r_train_and_analyze_all(net, 10); % run 25 network instances
+[nets, pats, datas] = r_train_and_analyze_all_by_sequence(net, 10); % run 25 network instances

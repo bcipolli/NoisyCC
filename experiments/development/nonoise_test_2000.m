@@ -60,4 +60,4 @@ net.sets.noise_input      = 1E-6;%.001;%001;%1;
 net.sets.dirname = fullfile(guru_getOutPath('cache'), 'development', mfilename());
 
 
-r_train_and_analyze_all(net, 25); % run 25 network instances
+r_train_and_analyze_all_by_sequence(net, 25); % run 25 network instances

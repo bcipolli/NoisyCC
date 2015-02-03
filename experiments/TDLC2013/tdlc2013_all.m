@@ -32,7 +32,7 @@ for rseed=(289-1+[1:chunk_size:25])
           if ~exist(dirname,'dir'), mkdir(dirname); end;
           net.sets.dirname = dirname;
 
-          r_train_and_analyze_all(net, chunk_size);
+          r_train_and_analyze_all_by_sequence(net, chunk_size);
       end;
     end;
   end;
