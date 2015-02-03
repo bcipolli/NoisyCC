@@ -172,12 +172,13 @@ function [net] = r_massage_params(net)
         sets.matfile = [sets.matfile '.net.mat'];
     end;
 
-    if (~isfield(fn, 'init')),    fn.init    = str2func(['r_init_'    sets.init_type]); end;
-    if (~isfield(fn, 'pats')),    fn.pats    = str2func(['r_pats_'    sets.init_type]); end;
-    if (~isfield(fn, 'train')),   fn.train    = str2func(['r_train_'    sets.train_mode]); end;
-    if (~isfield(fn, 'analyze')), fn.analyze    = str2func(['r_analyze_'    sets.init_type]); end;
-    if (~isfield(fn, 'net_test')), fn.net_test = @r_record_lesion_performance; end;
-
+    fn = add_if_needed_and_possible(fn, 'init',        ['r_init_' sets.init_type]);
+    fn = add_if_needed_and_possible(fn, 'pats',        ['r_pats_' sets.train_mode]);
+    fn = add_if_needed_and_possible(fn, 'train',       ['r_train_' sets.init_type]);
+    fn = add_if_needed_and_possible(fn, 'analyze_one', ['r_analyze_one_' sets.init_type]);
+    fn = add_if_needed_and_possible(fn, 'analyze_all', ['r_analyze_all_' sets.init_type]);
+    fn = add_if_needed_and_possible(fn, 'plot_one',    ['r_plot_one_' sets.init_type]);
+    fn = add_if_needed_and_possible(fn, 'plot_all',    ['r_plot_all_' sets.init_type]);
 
     %%%%%%%%%%%%%%%%
     % recombine
@@ -186,6 +187,10 @@ function [net] = r_massage_params(net)
     net.sets = sets;
     net.fn   = fn;
 
+function fn = add_if_needed_and_possible(fn, prop_name, func_name)
+    if ~isfield(fn, prop_name && exist(func_name)
+        fn.(prop_name) = str2func(func_name);
+    end;
 
 function h = r_get_hash(sets, sets_to_skip)
     if ~exist('sets_to_skip')
