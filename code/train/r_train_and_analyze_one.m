@@ -90,7 +90,6 @@ function [net, pats, data] = r_train_and_analyze_one(net, save_data)
                 fprintf(' done.\n');
             end;
         end;
-    end;
 
     %% Save the result
     if save_data && something_changed
