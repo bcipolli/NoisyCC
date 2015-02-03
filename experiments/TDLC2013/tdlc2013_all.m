@@ -1,4 +1,4 @@
-template_net = tdlc_args()
+template_net = tdlc2013_args()
 
 if ~exist('matlabpool', 'file')
    chunk_size = 1;
@@ -39,7 +39,7 @@ for rseed=(289-1+[1:chunk_size:25])
 end;
 
 % Make into one giant cache
-cache_dir         = guru_fileparts(fileparts(net.sets.dirname), 'name');
+cache_dir         = guru_fileparts(net.sets.dirname, 'path');
 cache_file        = fullfile(cache_dir, [mfilename '.mat']);
 [~,~,folders] = r_collect_data_looped( cache_dir );
 
