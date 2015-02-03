@@ -79,10 +79,20 @@ function [net, pats, data] = r_train_and_analyze_one(sets, rseed, save_data)
             fprintf('done.\n');
             something_changed = true;
         end;
-        if something_changed && isfield(net.fn, 'analyze')
-            fprintf('Analyzing via function callback (%s) ...', func2str(net.fn.analyze));
-            data = net.fn.analyze(net, pats, data);
-            fprintf('done.\n');
+
+        % custom analysis callback
+        if something_changed
+            if isfield(net.fn, 'analyze_one')
+                fprintf('Analyzing via function callback (%s) ...', func2str(net.fn.analyze_one));
+                data = net.fn.analyze_one(net, pats, data);
+                fprintf('done.\n');
+            end;
+
+            if isfield(net.fn, 'plot_one')
+                fprintf('Plotting via function callback (%s) ...', func2str(net.fn.plot_one))
+                net.fn.plot_one(net, pats, data);
+                fprintf(' done.\n');
+            end;
         end;
     end;
 
