@@ -204,7 +204,7 @@ function [n, blobs, sets] = load_data_blobs(dirpath, filter_fn)
           filepath = fullfile(dirpath, files(fi).name);
           fprintf('Loading %s...', filepath);
 
-          try
+          %try
              b = load(fullfile(dirpath, files(fi).name));
              if isfield(b, 'ex') || isfield(b.data, 'ex')
                  fprintf(' skipping exception.\n');
@@ -214,11 +214,11 @@ function [n, blobs, sets] = load_data_blobs(dirpath, filter_fn)
                  continue;
              end;
              fprintf(' done.\n');
-          catch
+          %catch
 
-            fprintf(' skipping from exception: %s\n', lasterr);
-            continue;
-          end;
+          %  fprintf(' skipping from exception: %s\n', lasterr);
+          %  continue;
+          %end;
 
           % ????
           %b.data.E_pat = b.data.E_pat/b.net.sets.dt;
