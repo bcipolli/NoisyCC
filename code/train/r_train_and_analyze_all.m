@@ -37,7 +37,7 @@ function [nets, pats, datas, figs] = r_train_and_analyze_all(template_net, nexam
     end; end; end;
 
     % Determine which nets are good.
-    idx = find_successful_nets(nets, pats, datas);
+    idx = find_successful_nets(nets, template_net.sets, datas);
 
     %% Analyze the full networks and massage the results
     if isfield(template_net.fn, 'analyze_all')
@@ -61,7 +61,6 @@ function [nets, pats, datas] = r_train_many_analyze_one(net, n_nets)
 %function r_train_and_analyze_many(net, n_nets)
 %
 % Loops over some # of networks to execute them.
-
 
     % Select # of networks to run
     if ~exist('n_nets','var')
@@ -106,8 +105,8 @@ function idx = find_successful_nets(nets, sets, datas)
     good = cell(size(built));
 
     for ci=1:numel(nets)
-        built{ci}   = cellfun(@(d) ~isfield(d, 'ex') && isfield(d, 'actcurve'), datas);
-        trained{ci} = cellfun(@(d) isfield(d, 'good_update') && (length(d.good_update) < sets.niters || nnz(~d.good_update) == 0), datas);
+        built{ci}   = cellfun(@(d) ~isfield(d, 'ex') && isfield(d, 'actcurve'), datas{ci});
+        trained{ci} = cellfun(@(d) isfield(d, 'good_update') && (length(d.good_update) < sets.niters || nnz(~d.good_update) == 0), datas{ci});
         good{ci}    = built{ci} & trained{ci};
         good{ci}
     end;
