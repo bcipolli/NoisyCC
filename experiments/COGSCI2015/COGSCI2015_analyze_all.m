@@ -1,5 +1,4 @@
 function all_data = COGSCI2015_analyze_all(nets, pats, datas, idx)
-keyboard
     sims = cell(size(nets));
     simstats = cell(size(nets));
     lagstats = cell(size(nets));

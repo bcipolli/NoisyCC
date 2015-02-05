@@ -33,7 +33,7 @@ function net = COGSCI2015_common_args(varargin)
     net.sets.W_LIM           = inf*[-1 1];  %% 2?
     net.sets.train_criterion = 0.5;
     net.sets.init_type       = 'lewis_elman';
-    net.sets.train_mode      = 'resilient';
+    net.sets.train_mode      = 'resilient_batch';
 
     %timing parameters
     net.sets.dt     = 0.01;

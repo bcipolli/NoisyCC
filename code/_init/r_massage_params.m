@@ -173,12 +173,13 @@ function [net] = r_massage_params(net)
     end;
 
     fn = add_if_needed_and_possible(fn, 'init',        ['r_init_' sets.init_type]);
-    fn = add_if_needed_and_possible(fn, 'pats',        ['r_pats_' sets.train_mode]);
-    fn = add_if_needed_and_possible(fn, 'train',       ['r_train_' sets.init_type]);
+    fn = add_if_needed_and_possible(fn, 'pats',        ['r_pats_' sets.init_type]);
+    fn = add_if_needed_and_possible(fn, 'train',       ['r_train_' sets.train_mode]);
     fn = add_if_needed_and_possible(fn, 'analyze_one', ['r_analyze_one_' sets.init_type]);
     fn = add_if_needed_and_possible(fn, 'analyze_all', ['r_analyze_all_' sets.init_type]);
     fn = add_if_needed_and_possible(fn, 'plot_one',    ['r_plot_one_' sets.init_type]);
     fn = add_if_needed_and_possible(fn, 'plot_all',    ['r_plot_all_' sets.init_type]);
+    fn = add_if_needed_and_possible(fn, 'net_test',     'r_record_lesion_performance');
 
     %%%%%%%%%%%%%%%%
     % recombine

@@ -39,8 +39,8 @@ function [net, pats, data] = r_train_and_analyze_one(sets, rseed, save_data)
         if file_loaded
             if ~exist('net',  'var'), fprintf('net not found in matfile; retraining.\n'); end;
             if ~exist('pats', 'var'), fprintf('pats not found in matfile; ignoring.\n'); end;
-            if ~exist('data', 'var'), fprintf('data not found in matfile; re-analyzing.\n'); end;
-            if isfield(data, 'ex')
+            %if ~exist('data', 'var'), fprintf('data not found in matfile; re-analyzing.\n'); end;
+            if exist('data', 'var') && isfield(data, 'ex')
                 % Check for inadvertent errors/messages that require reanalysis
                 if ~isempty(findstr('time to debug', guru_getfield(data.ex, 'message', [])))
                     clear('data');
