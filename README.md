@@ -1,6 +1,3 @@
-NoisyCC
-=======
-
 Simulations, using Ringo et al. (1994) as a starting point, which:
 * Show that the Ringo results only matter for the difference between the intra-hemispheric and inter-hemispheric conduction delays.
 * Implement axon conduction delay noise
@@ -26,3 +23,6 @@ Adding new modules:
 3. Reset the following values in the script: 
     a. `net.sets.dataset = DIR` 
     b. `net.sets.init_type = DIR` 
+=======
+# matlab-utils
+Shared MATLAB utility functions from within our lab
