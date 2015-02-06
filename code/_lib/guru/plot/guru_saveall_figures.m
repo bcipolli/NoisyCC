@@ -8,6 +8,8 @@ function guru_saveall_figures(results_dir, types, overwrite, close_after)
     % print all figures
     fh = unique(get(0, 'Children'));
 
+    fprintf('Saving %d figures...', length(fh));
+
     % Store figure sizes, as somehow they get
     %   reset during the print process
     %   when doing remotely, with no display set.
@@ -37,6 +39,9 @@ function guru_saveall_figures(results_dir, types, overwrite, close_after)
         end;
         if close_after, close(gcf); end;
     end;
+
+    fprintf(' done.\n');
+
 
 function file_path = get_unique_filename(results_dir,figure_name, ext, overwrite, start_idx)
     if ~exist('start_idx', 'var')
