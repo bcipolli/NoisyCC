@@ -1,4 +1,4 @@
-function [data, something_changed] = analysis_callback(net, pats, data)
+function [data, something_changed] = COGSCI2015_analyze_one(net, pats, data)
     something_changed = false;
 
     if ~all(isfield(data, {'sims', 'simstats', 'lagstats'})) % Always analyze similarities
