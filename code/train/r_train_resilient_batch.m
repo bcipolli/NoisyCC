@@ -128,13 +128,14 @@ function [net,data] = r_train_resilient_batch(net,pats,data)
                     axon_noise = axon_noise .* repmat(squeeze(y(ti,:,:)), [1 1 size(net.w,2)]);
                 end;
 
-                if iter==25 && ti==10 && numel(net.idx.cc) > 0 % Report on the noise level
+                if iter==25 && ti==10 && numel(net.idx.cc) > 0 && axon_noise_coeff > 0% Report on the noise level
                     cc_act = squeeze(y(ti,:,net.idx.cc));
                     avg_cc_act = sum(abs(cc_act(:))) / nnz(cc_act);
                     std_cc_act = mean(std(cc_act));
                     cc_axon_noise = axon_noise(:,:,net.idx.cc);
                     avg_axon_noise = sum(abs(cc_axon_noise(:))) / nnz(cc_axon_noise);%pats.npat / length(net.idx.cc);
-                    fprintf('Average noise per pattern per synapse: %.2e = %.2f%% of mean, %.2f%% variance of cc activation\n', avg_axon_noise, 100 * avg_axon_noise / avg_cc_act, 100 * avg_axon_noise / std_cc_act);
+                    fprintf('Average noise per pattern per synapse: %.2e = %.2f%% of mean, %.2f%% variance of cc activation\n', ...
+                            avg_axon_noise, 100 * avg_axon_noise / avg_cc_act, 100 * avg_axon_noise / std_cc_act);
                 end;
 
                 x(ti,:,:)   = sum(w_repd .* (y_d + axon_noise), 2);  % finally add in the noise
