@@ -6,6 +6,7 @@ function net = COGSCI2015_common_args(varargin)
 % Idur: duration (# time steps, after onset @ Idel) to keep input on
 % Sdel: delay (reverse, from end) to measure error
 % Sdur: duration (# time steps, reverse from Sdel) to measure the error.
+    more off;
     close all;  % Hack place to put it, but tired of saving all sorts of crazy figures!
     addpath(genpath(fullfile(fileparts(which(mfilename)), '..', '..', 'code')));
     dbstop if error;
