@@ -22,7 +22,7 @@ function net = COGSCI2015_common_args(varargin)
     net.fn.analyze_one = @COGSCI2015_analyze_one;
     net.fn.analyze_all = @COGSCI2015_analyze_all;
     net.fn.plot_one = @COGSCI2015_plot_one;
-    net.fn.ploe_all = @COGSCI2015_plot_all;
+    net.fn.plot_all = @COGSCI2015_plot_all;
 
     %training parameters
     net.sets.niters          = 1000; %training iterations

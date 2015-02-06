@@ -1,18 +1,15 @@
-function [net, pats, data] = r_train_and_analyze_one(sets, rseed, save_data)
+function [net, pats, data] = r_train_and_analyze_one(net, save_data)
 %
 
     if ~exist('save_data', 'var'), save_data = true; end;
     something_changed = false;
 
-
     %% Make sure not to reuse networks!
-    net.sets = sets;
-    net.sets.rseed = rseed;
     net = r_massage_params(net);
     matfile = fullfile(net.sets.dirname, net.sets.matfile);
 
     %% Load from cache
-    if ~guru_getfield(sets, 'force', false)
+    if ~guru_getfield(net.sets, 'force', false)
         file_loaded = false;
         if exist(get_all_filename(matfile), 'file')
             % one file contains all
@@ -69,7 +66,6 @@ function [net, pats, data] = r_train_and_analyze_one(sets, rseed, save_data)
             fprintf('\t%s\n', ex.stack.file);
         end;
     end;
-
 
     %% Analyze, if possible / needed
     if ~isfield(data, 'ex')

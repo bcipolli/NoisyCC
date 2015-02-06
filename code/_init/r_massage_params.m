@@ -99,7 +99,7 @@ function [net] = r_massage_params(net)
     if (~isfield(sets,'w_decay')),    sets.w_decay    = 0.0;             end; % amount of weight decay (regularization); 0=none
     if (~isfield(sets,'noise_init')), sets.noise_init = 0.0;             end; %no noisy initialization
     if (~isfield(sets,'noise_input')),sets.noise_input= 0.0;             end; %no noisy training inputs
-    if (~isfield(sets,'force')),      sets.force      = true;            end; %no forced re-training
+    if (~isfield(sets,'force')),      sets.force      = false;           end; %no forced re-training
 
     if (~isfield(sets,'eta_w_min')), sets.eta_w_min   = 0;   end;
 
