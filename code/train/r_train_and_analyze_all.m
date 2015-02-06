@@ -25,7 +25,7 @@ function [nets, pats, datas, figs] = r_train_and_analyze_all(template_net, nexam
     datas = cell(size(nets));
 
     %% Train in parallel, gather data sequentially
-    for mi=1:nexamples, for ni = 1:length(nccs), for di=1:length(delays), for ti=1:length(Ts)
+    parfor mi=1:nexamples, for ni = 1:length(nccs), for di=1:length(delays), for ti=1:length(Ts)
         % Train the network
         net = set_net_params(template_net, nccs(ni), delays(di), Ts(ti), mi);
         r_train_many_analyze_one(net, 1);
@@ -41,11 +41,16 @@ function [nets, pats, datas, figs] = r_train_and_analyze_all(template_net, nexam
 
     %% Analyze the full networks and massage the results
     if isfield(template_net.fn, 'analyze_all')
-        all_data = template_net.fn.analyze_all(nets, pats, datas, idx, varargin{:})
+        fprintf('Analyzing via function callback (%s) ...', func2str(net.fn.analyze_all));
+        all_data = template_net.fn.analyze_all(nets, pats, datas, idx, varargin{:});
+        fprintf('done.\n');
     end;
 
+    all_data.nexamples = nexamples;  % this may create the data structure, needed below!
     if isfield(template_net.fn, 'plot_all')
-        template_net.fn.plot_all(nets, pats, datas, idx, all_data, varargin{:})
+        fprintf('Plotting via function callback (%s) ...', func2str(net.fn.plot_all));
+        template_net.fn.plot_all(nets, pats, datas, idx, all_data, varargin{:});
+        fprintf('done.\n');
     end;
 
     if ~isempty(opts.output_types)  % passing empty will keep the figures open...
@@ -71,13 +76,13 @@ function [nets, pats, datas] = r_train_many_analyze_one(net, n_nets)
 
     % Get random seed, save default network settings
     min_rseed = net.sets.rseed;
-    sets = net.sets;
 
     nets = cell(n_nets, 1);
     datas = cell(n_nets, 1);
     for si=(min_rseed-1+[1:n_nets])
         ii = si - min_rseed + 1;
-        [nets{ii}, pats, datas{ii}] = r_train_and_analyze_one(sets, si);
+        net.sets.rseed = si;
+        [nets{ii}, pats, datas{ii}] = r_train_and_analyze_one(net);
     end;
 
 
