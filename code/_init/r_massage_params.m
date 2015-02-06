@@ -211,7 +211,7 @@ function h = r_get_hash(sets, sets_to_skip)
 function [str] = r_dump_sets(sets, sets_to_skip)
 
     str = '';
-    a = fields(sets);
+    a = fieldnames(sets);
     for ai=1:length(a)
         % Skip settings that we know will break across machines
         if any(strcmp(a{ai}, sets_to_skip)), continue; end;
