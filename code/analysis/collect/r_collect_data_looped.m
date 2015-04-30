@@ -1,37 +1,53 @@
-function [d,s,folders] = r_collect_data_looped(dirname, cache_file, prefix, filter_fn, force_load)
+function [data, sets, collection_names] = r_collect_data_looped(dirname, cache_file, filter_fns, force_load)
+%
+% dirname: directory to search.
+% cache_file: cache file to load/save results from/to
+% filter_fns: a second way to split results or filter files.
 %
 % d: data
 % s: settings
 % folders: 
-
-if ~exist('dirname','var'),    dirname    = 'runs'; end;
-if ~exist('cache_file','var'), cache_file = ''; end; % no caching
 if ~exist('prefix','var'),     prefix=''; end;
-if ~exist('force_load', 'var'),     force_load = true; end;
-if ~exist('filter_fn', 'var'), filter_fn = @(blob) (true); end;
+if ~exist('filter_fns', 'var'), filter_fns = @(blob) (true); end;
+if ~exist('force_load', 'var'), force_load = true; end;
 
 % Get all subfolders with given prefix
 if isempty(dirname)
+    guru_assert(exist('cache_file', 'var'), 'Must specify an existing cache file when dirname is empty!')
     paths = r_load_cache_file(cache_file);
     folders = cellfun(@(d) guru_fileparts(d,'name'), paths, 'UniformOutput', false);
 else
-    search_string = fullfile(dirname, [prefix '*']);
     fprintf('Collecting data from "%s"\n', search_string);
-    folders = dir(search_string);
+    folders = dir(dirname);
     folders = folders([folders.isdir]);
     folders = setdiff({folders.name}, {'.','..'});
+    folders = cellfun(@(d) fullfile(dirname, d), folders, 'UniformOutput', false);
+    % if there are no subdirectories, just use files from the current directory.
+    if isempty(folders)
+        folders = {dirname};
+    end;
 end;
 
-d = cell(length(folders),1);
-s = cell(length(folders),1);
+% Separate files virtually via filter functions.
+if length(folders) == 1 && iscell(filter_fns)
+    data = cell(size(filter_fns));
+    sets = cell(size(filter_fns));
 
-for foi=1:length(folders)
-    % Get the data 
-    curdir = fullfile(dirname, folders{foi});
-    fprintf('Processing [%s]...', curdir);
-    [d{foi},~,s{foi}] = r_get_cache_data(curdir, cache_file, filter_fn, force_load); % break the caching
-%    d{foi} = d{foi}{1}; % strip off extra cell layer
-%    s{foi} = s{foi}{1};
-    
-    fprintf('\n');
-end;
+    for foi=1:numel(filter_fns)
+        cur_filter = filter_fns{foi};
+        fprintf('Processing [%s]...', dirname);
+        [data{foi}, ~, sets{foi}] = r_get_cache_data(dirname, cache_file, filter_fn, force_load); % break the caching
+        fprintf('\n');
+    end;
+
+% Separate files by directory location
+else
+    data = cell(size(folders));
+    sets = cell(size(folders));
+
+    for foi=1:numel(folders)
+        curdir = folders{foi};
+        fprintf('Processing [%s]...', curdir);
+        [data{foi}, ~, sets{foi}] = r_get_cache_data(curdir, cache_file, filter_fns, force_load); % break the caching
+        fprintf('\n');
+    end;

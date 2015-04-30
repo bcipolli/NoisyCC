@@ -102,8 +102,6 @@ function fh = r_plot_similarity_surfaces_1D(nets, vals, simstats, lagstats, dim_
 
     dim_name = vals.dims.names{strcmp(vals.dims.ids, dim_id)};
 
-    yvals = sort(vals.(dim_id));
-
     [locs] = r_get_locs(vals);
     col_ids = {'cc', 'ih', 'hu'};
 
@@ -111,12 +109,11 @@ function fh = r_plot_similarity_surfaces_1D(nets, vals, simstats, lagstats, dim_
     nrows = length(locs.cc.idx);
 
     %% Figure 1: mean difference from output similarity
-    for pti=1:vals.npattypes
+    for pti=1:vals.npattypes  % intra- pattern, inter- pattern, all together
         [data] = r_distill_data(simstats, dim_id, vals, pti, data_plotted);
-        lagdata = r_distill_data(simstats, dim_id, vals, pti, data_plotted);
 
         if ismember(1, figs)
-            fh(end+1) = figure('name', 'f1h', 'Position', [ 0  0 1000*ncols  600*nrows]);
+            fh(end+1) = figure('name', 'diff-from-output', 'Position', [ 0  0 500*ncols  500*nrows]);
             for rowi=1:nrows
                 for coli=1:ncols
                     ploti = coli + ncols*(rowi-1);
@@ -125,16 +122,17 @@ function fh = r_plot_similarity_surfaces_1D(nets, vals, simstats, lagstats, dim_
 
                     subplot(nrows,ncols,ploti);
                     set(gca, 'FontSize', 16);
-
                     surf(1:vals.tsteps, vals.(dim_id), loc_data);
-                    title(strrep(loc_name, '_', '\_'));
+                    title(strrep(loc_name, '_', '\_'), 'FontSize', 16);
 
-                    set(gca, 'xlim', [1 vals.tsteps], 'ylim', [min(yvals), max(yvals)], 'zlim', sort([0 1]));
-                    set(gca, 'ytick', yvals);
+                    %set(gca, 'xlim', [1 vals.tsteps]);
+                    %set(gca, 'ylim', [min(vals.(dim_id)), max(vals.(dim_id))]);
+                    %set(gca, 'zlim', sort([0 1]));
+                    %set(gca, 'ytick', sort(vals.(dim_id)));
                     view([40.5 32]);
 
-                    xlabel('Time (steps)');
-                    ylabel(dim_name);
+                    %xlabel('Time (steps)');
+                    %ylabel(dim_name);
                     zlabel('asymmetry');
                 end;
             end;
@@ -207,7 +205,8 @@ function [data] = r_distill_data(simstats, dim_id, vals, pattern_idx, data_plott
             li = locs.(col_ids{coli}).idx(rowi);
             for xi=1:length(vals.(dim_id))
                 if isempty(simstats{xi}), continue; end;
-                data(coli, rowi, xi, :) = abs(squeeze(simstats{xi}(:, li, pattern_idx, data_plotted))); %eliminate the sign for cleaner plotting
+                data(coli, rowi, xi, :) = abs(squeeze(simstats{xi}.mean(:, li, pattern_idx, data_plotted))); %eliminate the sign for cleaner plotting
             end;
         end;
     end;
+    data(isnan(data)) = 0;

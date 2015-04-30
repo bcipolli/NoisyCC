@@ -27,7 +27,7 @@ function [net] = r_massage_params(net)
 %   alpha_w: momentum
 %
 %%%%
-%   
+%
 %
 %   REL_E_MAX:    maximum relative error increase that is acceptable
 %   bad_pct_w:    allowable % of bad weight updates for a good training iteration
@@ -38,9 +38,8 @@ function [net] = r_massage_params(net)
 %   wt_wts:
 %   verbose
 %   test_freq
-%   test_fn : function to allow appending data
 
-    % 
+    %
 %   online')),    sets.online      = false;      end;
 %   bias_val')),  sets.bias_val    = 1;          end;
 %   grad_pow')),  sets.grad_pow    = 1;          end;
@@ -50,12 +49,12 @@ function [net] = r_massage_params(net)
     sets = net.sets;
     if (isfield(net,'fn')), fn = net.fn;
     else,                  fn = struct(); end;
-    
+
     %%%%%%%%%%%%%%%%%%%%%%%%%
     % Required parameters
     %%%%%%%%%%%%%%%%%%%%%%%%%
-    
-    if (~isfield(sets,'D_INIT')),      error('sets.D_INIT not set.'); end;      
+
+    if (~isfield(sets,'D_INIT')),      error('sets.D_INIT not set.'); end;
     if (~isfield(sets,'D_CC_INIT')),   error('sets.D_CC_INIT not set.');  end;
     if (~isfield(sets,'D_IH_INIT')),   error('sets.D_IH_INIT not set.');  end;
 
@@ -74,19 +73,19 @@ function [net] = r_massage_params(net)
 
     if (~isfield(sets,'I_LIM')),       sets.I_LIM = sets.tstart + [sets.dt sets.tstop]; end; %in terms of time, not steps
     if (~isfield(sets,'S_LIM')),       error('sets.S_LIM not set.'); end;  % min & max time to consider error
-    if (~isfield(sets,'T_INIT')),      error('sets.T_INIT not set.'); end;  %change     
+    if (~isfield(sets,'T_INIT')),      error('sets.T_INIT not set.'); end;  %change
     if (~isfield(sets,'T_LIM')),       sets.T_LIM = sets.T_INIT; end;
 
     % Training params
     %if (~isfield(sets,'npat')),     error('sets.npat not set.'); end;
     if (~isfield(sets,'eta_w')),     error('sets.eta_w not set.'); end;    %learning rate (initial)
-    if (~isfield(sets,'lambda_w')),  error('sets.lambda_w not set.'); end;    % lambda*E to control kappa. 
+    if (~isfield(sets,'lambda_w')),  error('sets.lambda_w not set.'); end;    % lambda*E to control kappa.
     if (~isfield(sets,'phi_w')),     error('sets.phi_w not set.'); end;      % multiplicative decrease to eta
     if (~isfield(sets,'alpha_w')),   error('sets.alpha_w not set.'); end;      %momentum
 
-    % 
+    %
     guru_assert(sets.ncc <= sets.nhidden_per, 'NCC must not be greater than the # of hidden units per hemisphere.');
-        
+
 
     %%%%%%%%%%%%%%%%%%%%%%%%%
     % Optional parameters
@@ -100,22 +99,22 @@ function [net] = r_massage_params(net)
     if (~isfield(sets,'w_decay')),    sets.w_decay    = 0.0;             end; % amount of weight decay (regularization); 0=none
     if (~isfield(sets,'noise_init')), sets.noise_init = 0.0;             end; %no noisy initialization
     if (~isfield(sets,'noise_input')),sets.noise_input= 0.0;             end; %no noisy training inputs
-    if (~isfield(sets,'force')),      sets.force      = true;            end; %no forced re-training
-    
-    if (~isfield(sets,'eta_w_min')), sets.eta_w_min   = 0;   end;    
-    
+    if (~isfield(sets,'force')),      sets.force      = false;           end; %no forced re-training
+
+    if (~isfield(sets,'eta_w_min')), sets.eta_w_min   = 0;   end;
+
     if (~isfield(sets,'eta_T')),     sets.eta_T       = 0;   end;     %learning rate (initial)
     if (~isfield(sets,'eta_T_min')), sets.eta_T_min   = 0;   end;
     if (~isfield(sets,'lambda_T')),  sets.lambda_T    = 0;   end;   % additive increase (times TOTAL ERROR)
     if (~isfield(sets,'phi_T')),     sets.phi_T       = 0;   end;        % multiplicative decrease to eta
     if (~isfield(sets,'alpha_T')),   sets.alpha_T     = 0;   end;     %momentum
-    
+
     if (~isfield(sets,'eta_D')),     sets.eta_D       = 0;   end;      %learning rate (initial)
     if (~isfield(sets,'eta_D_min')), sets.eta_D_min   = 0;   end;
     if (~isfield(sets,'lambda_D')),  sets.lambda_D    = 0;   end;  % additive increase (times TOTAL ERROR)
     if (~isfield(sets,'phi_D')),     sets.phi_D       = 0;   end;  % multiplicative decrease to eta
     if (~isfield(sets,'alpha_D')),   sets.alpha_D     = 0;   end;  %momentum
-    
+
     % Init params
     if (~isfield(sets,'W_INIT')),    sets.W_INIT      = [-1    1];        end;
     if (~isfield(sets,'W_LIM')),     sets.W_LIM       = [-inf  inf];      end;
@@ -133,20 +132,20 @@ function [net] = r_massage_params(net)
     if (~isfield(sets,'wt_wts')),    sets.wt_wts      = 0;          end;
     if (~isfield(sets,'verbose')),   sets.verbose     = false;      end;
     if (~isfield(sets,'test_freq')), sets.test_freq   = 100;        end;
-    if (~isfield(sets,'test_fn')),   sets.test_fn     = @r_record_lesion_performance; end;
-    % 
+
+    %
     if (~isfield(sets,'online')),    sets.online      = false;      end;
     if (~isfield(sets,'bias_val')),  sets.bias_val    = 1;          end;
     if (~isfield(sets,'grad_pow')),  sets.grad_pow    = 1;          end;
     if (~isfield(sets,'rseed')),     sets.rseed       = randi(1E3), end;
 
-    if (~isfield(sets, 'axon_noise')), sets.axon_noise=0; 
+    if (~isfield(sets, 'axon_noise')), sets.axon_noise=0;
     elseif numel(sets.axon_noise)>1, guru_assert(sets.niters==numel(sets.axon_noise), 'axon_noise must be scalar, or size must match niters'); end;
     %    if (isfield(sets, 'autoencoder') && ~sets.autoencoder)
 %        if (~isfield(sets,'ac')), sets.ac = sets; end;
-        
-        
-        
+
+
+
     %%%%%%%%%%%%%%%%%%%%%%%%%
     % Massaged parameters
     %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -154,39 +153,45 @@ function [net] = r_massage_params(net)
     sets.init_type  = strrep(sets.init_type,  '-', '_');
     sets.dataset    = strrep(sets.dataset,    '-', '_');
     sets.train_type = strrep(sets.train_type, '-', '_');
-    
-        
+
+
     %%%%%%%%%%%%%%%%%%%%%%%%%
     % Calculated parameters
     %%%%%%%%%%%%%%%%%%%%%%%%%
+
+    if ~isfield(sets, 'dirname'), sets.dirname = fullfile(guru_getOutPath('cache'), net.sets.dataset); end;
     if (~isfield(sets, 'D_LIM'))
         all_delays = [sets.D_INIT(:); sets.D_CC_INIT(:); sets.D_IH_INIT(:)];
         sets.D_LIM = [min(all_delays) max(all_delays)];
     end;
-
-
-    fn.init    = str2func(['r_init_'    sets.init_type]);
-    fn.pats    = str2func(['r_pats_'    sets.dataset]);
-    fn.train   = str2func(['r_train_'   sets.train_type]);
-    fn.analyze = str2func(['r_analyze_' sets.dataset]);
-    
-    if ~isfield(sets, 'dirname'), sets.dirname = '.'; end;
-
-    % Make a filename for saving
-    if (~isfield(sets,'matfile'))
+    if (~isfield(sets,'matfile'))     % Make a filename for saving
         sets.matfile = sprintf('%s_t%d_r%d_%s',sets.dataset, sets.tsteps, sets.rseed, r_get_hash(sets));
         if (isfield(sets,'autoencoder') && sets.autoencoder)
           sets.matfile = [sets.matfile '-ac'];
         end;
-        sets.matfile = [sets.matfile '.mat'];
+        sets.matfile = [sets.matfile '.net.mat'];
     end;
-    
-    
+
+    fn = add_if_needed_and_possible(fn, 'init',        ['r_init_' sets.init_type]);
+    fn = add_if_needed_and_possible(fn, 'pats',        ['r_pats_' sets.init_type]);
+    fn = add_if_needed_and_possible(fn, 'train',       ['r_train_' sets.train_mode]);
+    fn = add_if_needed_and_possible(fn, 'analyze_one', ['r_analyze_one_' sets.init_type]);
+    fn = add_if_needed_and_possible(fn, 'analyze_all', ['r_analyze_all_' sets.init_type]);
+    fn = add_if_needed_and_possible(fn, 'plot_one',    ['r_plot_one_' sets.init_type]);
+    fn = add_if_needed_and_possible(fn, 'plot_all',    ['r_plot_all_' sets.init_type]);
+    fn = add_if_needed_and_possible(fn, 'net_test',     'r_record_lesion_performance');
+
     %%%%%%%%%%%%%%%%
     % recombine
+    %%%%%%%%%%%%%%%%
+
     net.sets = sets;
     net.fn   = fn;
-    
+
+function fn = add_if_needed_and_possible(fn, prop_name, func_name)
+    if ~isfield(fn, prop_name) && exist(func_name)
+        fn.(prop_name) = str2func(func_name);
+    end;
 
 function h = r_get_hash(sets, sets_to_skip)
     if ~exist('sets_to_skip')
@@ -194,7 +199,6 @@ function h = r_get_hash(sets, sets_to_skip)
             'force', ...
             'verbose', ...
             'test_freq', ...
-            'test_fn', ...
             'dirname', 'matfile', ...
             'n_nets' ...
         };
@@ -203,19 +207,19 @@ function h = r_get_hash(sets, sets_to_skip)
 
     origString = r_dump_sets(sets, sets_to_skip);
     h = sprintf('%d', round( sum(origString.*[1:5:5*length(origString)]) ));
-    
+
 function [str] = r_dump_sets(sets, sets_to_skip)
-    
+
     str = '';
-    a = fields(sets);
+    a = fieldnames(sets);
     for ai=1:length(a)
         % Skip settings that we know will break across machines
         if any(strcmp(a{ai}, sets_to_skip)), continue; end;
-        
+
         v = sets.(a{ai});
-        str = [str '%s: ' a{ai}]; 
+        str = [str '%s: ' a{ai}];
         if (isnumeric(v))
-            str = [str mat2str(v(:))]; 
+            str = [str mat2str(v(:))];
         elseif (ischar(v))
             str = [str v];
         elseif (islogical(v))
@@ -227,5 +231,5 @@ function [str] = r_dump_sets(sets, sets_to_skip)
         end;
         str = sprintf('%s\n', str);
     end;
-    
+
 

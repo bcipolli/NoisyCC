@@ -5,7 +5,11 @@ function [in_pats, out_pats, pat_cls, pat_lbls, idx] = r_pats_unaryadd(sets, opt
 
     inpats = 0:31;
     inpats = dec2bin(inpats) - '0'; % convert to binary
+<<<<<<< HEAD
     outpats = mod(inpats + 1, 32)  % same as [1:31 0];
+=======
+    outpats = [1:31 0];
+>>>>>>> origin/COGSCI2015
     outpats = dec2bin(outpats) - '0'; % convert to binary
 
     % Split into input/output, revalue to -1 1

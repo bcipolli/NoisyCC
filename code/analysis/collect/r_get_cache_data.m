@@ -1,4 +1,4 @@
-function [data,ts,sets] = r_get_cache_data(dirs, cache_file, filter_fn, force_load)
+function [data, ts, sets] = r_get_cache_data(dirs, cache_file, filter_fn, force_load)
 %function [data,ts] = r_get_cache_data(irs, cache_file, filter_fn, force_load)
 %
 % Returns summarized data from the given directory.  It can come from 3
