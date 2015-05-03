@@ -1,6 +1,6 @@
-function net = tdlc_args()
+function [net, Idel, Idur, Sdel, Sdur] = tdlc2013_args()
 
-    addpath(genpath(fullfile(fileparts(which(mfilename)), '..', '..', '..', '_lib')));
+    addpath(genpath(fullfile(fileparts(which(mfilename)), '..', '..', '_lib')));
     addpath(genpath(fullfile(fileparts(which(mfilename)), '..', '..', 'code')));
     dbstop if error;
     %dbstop if warning;

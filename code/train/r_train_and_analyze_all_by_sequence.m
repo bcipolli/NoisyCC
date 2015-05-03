@@ -25,7 +25,7 @@ function [nets, pats, datas, figs] = r_train_and_analyze_all_by_sequence(templat
     datas = cell(size(nets));
 
     %% Train in parallel, gather data sequentially
-    parfor mi=1:nexamples, for ni = 1:length(nccs), for di=1:length(delays), for ti=1:length(Ts)
+    for mi=1:nexamples, for ni = 1:length(nccs), for di=1:length(delays), for ti=1:length(Ts)
         % Train the network
         net = set_net_params(template_net, nccs(ni), delays(di), Ts(ti), mi);
         r_train_many_analyze_one(net, 1);
@@ -40,14 +40,14 @@ function [nets, pats, datas, figs] = r_train_and_analyze_all_by_sequence(templat
     idx = find_successful_nets(nets, template_net.sets, datas);
 
     %% Analyze the full networks and massage the results
-    if isfield(template_net.fn, 'analyze_all')
+    if ~isempty(guru_getfield(template_net, 'fn.analyze_all', []))
         fprintf('Analyzing via function callback (%s) ...', func2str(net.fn.analyze_all));
         all_data = template_net.fn.analyze_all(nets, pats, datas, idx, varargin{:});
         fprintf('done.\n');
     end;
 
     all_data.nexamples = nexamples;  % this may create the data structure, needed below!
-    if isfield(template_net.fn, 'plot_all')
+    if ~isempty(guru_getfield(template_net, 'fn.plot_all', []))
         fprintf('Plotting via function callback (%s) ...', func2str(net.fn.plot_all));
         template_net.fn.plot_all(nets, pats, datas, idx, all_data, varargin{:});
         fprintf('done.\n');

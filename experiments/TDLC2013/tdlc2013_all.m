@@ -1,4 +1,4 @@
-template_net = tdlc2013_args()
+[template_net, Idel, Idur, Sdel, Sdur] = tdlc2013_args();
 
 if ~exist('matlabpool', 'file')
    chunk_size = 1;
@@ -28,7 +28,7 @@ for rseed=(289-1+[1:chunk_size:25])
 
           net.sets.rseed = rseed;
 
-          dirname = fullfile(template_sets, sprintf('%s-%dts-%dd%s', mfilename(), tsteps, delay,guru_iff(noise>0,'n','')));
+          dirname = fullfile(net.sets.dirname, sprintf('%s-%dts-%dd%s', mfilename(), tsteps, delay,guru_iff(noise>0,'n','')));
           if ~exist(dirname,'dir'), mkdir(dirname); end;
           net.sets.dirname = dirname;
 
