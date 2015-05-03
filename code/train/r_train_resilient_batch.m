@@ -11,8 +11,6 @@ function [net,data] = r_train_resilient_batch(net,pats,data)
     E               = zeros(ns.niters,pats.npat,pats.tsteps,net.noutput, 'single');
     data.E_pat      = zeros(ns.niters,pats.npat,net.noutput, 'single');           % error
     data.hu_pat     = zeros(ns.niters,pats.npat,net.nhidden, 'single');           % error
-    data.E_lesion   = zeros(floor(ns.niters/ns.test_freq),pats.npat,net.noutput, 'single');           % error
-    data.hu_lesion  = zeros(floor(ns.niters/ns.test_freq),pats.npat,net.nhidden, 'single');           % error
     data.E_iter     = zeros(ns.niters,1, 'single');
     data.learncurve = zeros(ns.niters,pats.npat,net.noutput,'single');
     data.actcurve   = zeros(pats.tsteps,pats.npat,net.noutput,'single');
@@ -74,6 +72,7 @@ function [net,data] = r_train_resilient_batch(net,pats,data)
     % Main Loop
     %%%%%%%%%%%%%%
     last_measure_ts = find(sum(sum(pats.s,3),2),1,'last'); % keep an index of the last measurement point
+    test_fn = guru_iff(isfield(net.fn, 'net_test'), net.fn.net_test, @(i,n,p,d) d);
 
     if (ns.verbose), r_print_pats(data); end;
 
@@ -129,13 +128,14 @@ function [net,data] = r_train_resilient_batch(net,pats,data)
                     axon_noise = axon_noise .* repmat(squeeze(y(ti,:,:)), [1 1 size(net.w,2)]);
                 end;
 
-                if iter==25 && ti==10 && numel(net.idx.cc) > 0 % Report on the noise level
+                if iter==25 && ti==10 && numel(net.idx.cc) > 0 && axon_noise_coeff > 0% Report on the noise level
                     cc_act = squeeze(y(ti,:,net.idx.cc));
                     avg_cc_act = sum(abs(cc_act(:))) / nnz(cc_act);
                     std_cc_act = mean(std(cc_act));
                     cc_axon_noise = axon_noise(:,:,net.idx.cc);
                     avg_axon_noise = sum(abs(cc_axon_noise(:))) / nnz(cc_axon_noise);%pats.npat / length(net.idx.cc);
-                    fprintf('Average noise per pattern per synapse: %.2e = %.2f%% of mean, %.2f%% variance of cc activation\n', avg_axon_noise, 100 * avg_axon_noise / avg_cc_act, 100 * avg_axon_noise / std_cc_act);
+                    fprintf('Average noise per pattern per synapse: %.2e = %.2f%% of mean, %.2f%% variance of cc activation\n', ...
+                            avg_axon_noise, 100 * avg_axon_noise / avg_cc_act, 100 * avg_axon_noise / std_cc_act);
                 end;
 
                 x(ti,:,:)   = sum(w_repd .* (y_d + axon_noise), 2);  % finally add in the noise
@@ -261,12 +261,7 @@ function [net,data] = r_train_resilient_batch(net,pats,data)
 
         %
         if (mod(iter,ns.test_freq)==0)
-            nl = r_lesion_cc(net);
-            td = r_forwardpass(nl,pats,data);
-            lesion_iter = round(iter/ns.test_freq);
-            data.E_lesion(lesion_iter,:,:) = td.E(last_measure_ts,:,:);
-            data.hu_lesion(lesion_iter,:,:) = td.y(last_measure_ts,:,net.idx.hidden);
-            clear('nl','td');
+            data = test_fn(iter, net, pats, data);
         end;
 
         % Do some reporting
@@ -519,10 +514,10 @@ function [net,data] = r_train_resilient_batch(net,pats,data)
     % Cut unused pre-allocated space
     data.good_update = data.good_update(1:iter);
     data.E_pat       = data.E_pat(1:iter,:,:);
-    data.E_lesion    = data.E_lesion(1:floor(iter/100),:,:);
     data.E_iter      = data.E_iter(1:iter);
     data.learncurve  = data.learncurve(1:iter,:,:);
     data.y           = y;
+    data = test_fn(-iter, net, pats, data);  % Call back for cleanup
 
     net.sets = ns; % save off any changes
 
